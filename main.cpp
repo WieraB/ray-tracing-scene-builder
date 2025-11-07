@@ -66,7 +66,9 @@ struct Triangle {
 };
 
 Sphere spheres[] = {//Scene: radius, position, emission, color, material
-  Sphere(600, Eigen::Vector3d(50,681.6-.27,81.6),Eigen::Vector3d(12,12,12), Eigen::Vector3d(0, 0, 0),     DIFF) //Lite
+  Sphere(600, Eigen::Vector3d(50, 681.6-.27, 81.6),Eigen::Vector3d(12,12,12), Eigen::Vector3d(0, 0, 0),     DIFF), //Light
+  Sphere(6, Eigen::Vector3d(-0.006, -5.0, -1.3),    Eigen::Vector3d(0, 0, 0),Eigen::Vector3d(1,1,1)*.999, REFR),//Glass
+  Sphere(100, Eigen::Vector3d(-200, -5.0, -200),     Eigen::Vector3d(0, 0, 0),  Eigen::Vector3d(.75,.75,.75), DIFF),//Back
 };
 
 // Triangle triangles[] = {
@@ -220,31 +222,23 @@ Eigen::Vector3d radiance(const Ray &r, int depth, unsigned short *Xi){
 int main(int argc,char *argv[]){
   int w=512,h=384,samps = argc >= 3 ? atoi (argv[2]) / 4 : 1;
 
-  // int w=300,h=250,samps = argc >= 3 ? atoi (argv[2]) / 4 : 1;
-
-
-
   if(argc >= 2) loadOBJ(argv[1], triangles);
-
-  // Ray cam(Eigen::Vector3d(10,52,190), Eigen::Vector3d(0,-0.042612,-1).normalized()); // cam pos, dir
 
   double fov = 20;  // Vertical view angle (field of view)
   auto theta = degrees_to_radians(fov);
   auto scale = std::tan(theta/2);
+  double aspect_ratio = double(w) / double(h);
 
-
-  // Ray cam(Eigen::Vector3d(-0.002,5.635,150), Eigen::Vector3d(0,0,-1).normalized()); // cam pos, dir
-
-
-  // Camera position and direction for isometric view
   Eigen::Vector3d camPos(110, -10, 110);
   Eigen::Vector3d camDir = (Eigen::Vector3d(0, 0, 0) - camPos).normalized(); // look at origin
 
   Ray cam(camPos, camDir);
 
-  // Eigen::Vector3d cx=Eigen::Vector3d(w*scale/h, 0, 0);
-  Eigen::Vector3d cx=Eigen::Vector3d(w*scale/h, 0, 0);
-  Eigen::Vector3d cy=(cx.cross(cam.d)).normalized()*scale;
+  Eigen::Vector3d right = cam.d.cross(Eigen::Vector3d(0, 1, 0)).normalized();
+  Eigen::Vector3d up = right.cross(cam.d).normalized();
+
+  Eigen::Vector3d cx = right * aspect_ratio * scale;
+  Eigen::Vector3d cy = up * scale;
   
   Eigen::Vector3d r=Eigen::Vector3d(0, 0, 0);
   std::vector<Eigen::Vector3d, Eigen::aligned_allocator<Eigen::Vector3d>> c(w*h);
