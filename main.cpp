@@ -242,6 +242,7 @@ int main(int argc,char *argv[]){
 
   Ray cam(camPos, camDir);
 
+  // Eigen::Vector3d cx=Eigen::Vector3d(w*scale/h, 0, 0);
   Eigen::Vector3d cx=Eigen::Vector3d(w*scale/h, 0, 0);
   Eigen::Vector3d cy=(cx.cross(cam.d)).normalized()*scale;
   
