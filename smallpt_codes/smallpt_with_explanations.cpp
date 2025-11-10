@@ -75,7 +75,7 @@ inline double clamp(double x){ return x<0 ? 0 : x>1 ? 1 : x; }
 // `toInt`: Converts a normalized value (between 0 and 1) to an integer in the range [0, 255] for image colors.
 inline int toInt(double x){ return int(pow(clamp(x),1/2.2)*255+.5); }
 
-// * The `intersect` function checks for intersections between a ray and the scene (represented by the `spheres` array). 
+// The `intersect` function checks for intersections between a ray and the scene (represented by the `spheres` array). 
 // It finds the closest sphere the ray intersects and returns the distance (`t`) and the ID of the intersected sphere.
 inline bool intersect(const Ray &r, double &t, int &id){
   double n=sizeof(spheres)/sizeof(Sphere), d, inf=t=1e20;
@@ -83,13 +83,12 @@ inline bool intersect(const Ray &r, double &t, int &id){
   return t<inf;
 }
 
-//* The `radiance` function is where the path tracing happens. 
-// It recursively calculates the color of a pixel based on how rays interact with objects in the scene.
+// The `radiance` function recursively calculates the colour of a pixel based on how rays interact with objects in the scene.
 // If the ray misses all objects, it returns black (`Vec()`).
 // If it hits an object, it computes the radiance based on the material type (diffuse, specular, or refractive).
 
 // `Ray r`**: The incoming ray that is being traced.
-// `int depth`**: The recursion depth. This controls how many times a ray can reflect or refract before the path tracing stops. 
+// `int depth`: The recursion depth. This controls how many times a ray can reflect or refract before the path tracing stops. 
 // If `depth` exceeds a certain value (in this case, 5), the algorithm terminates early with a probability.
 // `unsigned short *Xi`**: A pointer to a random number generator state array. 
 // It's used for randomness (sampling rays) to simulate the stochastic nature of light transport.
@@ -116,27 +115,27 @@ Vec radiance(const Ray &r, int depth, unsigned short *Xi){
 
   double p = f.x>f.y && f.x>f.z ? f.x : f.y>f.z ? f.y : f.z; // max refl
 
-   // This block controls recursion depth using **Russian Roulette** (RR). 
+   // This block controls recursion depth using Russian Roulette (RR). 
    // If the depth exceeds 5, there's a chance (based on the surface's reflectivity) that the function will terminate early.
    // If the algorithm chooses to stop, the function will return the sphere's emission color (`obj.e`), simulating light sources in the scene.
   if (++depth>5) if (erand48(Xi)<p) f=f*(1/p); else return obj.e; //R.R.
   
 
-  // In this case, the surface has a **diffuse** reflection (like a matte surface).
-  // The function generates a random direction `d` in 3D space that is scattered around the normal `n` (this is done using spherical coordinates).
+  // In this case, the surface has a diffuse reflection (e.g. a matte surface).
+  // The function generates a random direction `d` in 3D space that is scattered around the normal `n`.
   // It then calls the `radiance` function recursively with the new ray (`Ray(x, d)`), and the final color is the emission color `obj.e` plus the reflected color (`f.mult(...)`).
   if (obj.refl == DIFF){                  // Ideal DIFFUSE reflection
     double r1=2*M_PI*erand48(Xi), r2=erand48(Xi), r2s=sqrt(r2);
     Vec w=nl, u=((fabs(w.x)>.1?Vec(0,1):Vec(1))%w).norm(), v=w%u;
     Vec d = (u*cos(r1)*r2s + v*sin(r1)*r2s + w*sqrt(1-r2)).norm();
     return obj.e + f.mult(radiance(Ray(x,d),depth,Xi));
-  // In the case of **specular reflection** (like a mirror), the ray bounces off the surface in a perfect reflection, 
+  // In the case of **specular reflection** (e.g. a mirror), the ray bounces off the surface in a perfect reflection, 
   // so the new direction is calculated as the reflection of the incoming ray (`r.d - n * 2 * n.dot(r.d)`).
   // The function then recursively calls `radiance` to trace the reflected ray. 
   } else if (obj.refl == SPEC)            // Ideal SPECULAR reflection
     return obj.e + f.mult(radiance(Ray(x,r.d-n*2*n.dot(r.d)),depth,Xi));
 
-  // If the material is **refractive** (like glass), the function calculates the refraction direction `tdir` based on Snell's law 
+  // If the material is **refractive** (e.g. glass), the function calculates the refraction direction `tdir` based on Snell's law 
   // and handles both reflection and refraction with **total internal reflection** (TIR).
   // Similar to diffuse and specular, the function recursively traces the refracted ray (`Ray(x, tdir)`).
   // The function uses **Russian Roulette** (RR) to probabilistically choose between reflection 
@@ -162,30 +161,28 @@ Vec radiance(const Ray &r, int depth, unsigned short *Xi){
     radiance(reflRay,depth,Xi)*Re+radiance(Ray(x,tdir),depth,Xi)*Tr);
 }
 
-// In short, the `main` function sets up the camera and image dimensions, performs supersampling to reduce aliasing, 
+// The `main` function sets up the camera and image dimensions, performs supersampling to reduce aliasing, 
 // and traces rays through the scene to compute radiance for each pixel using recursive path tracing. 
-// It then writes the resulting colors to a PPM image file. The code uses parallel processing with OpenMP 
-// to speed up the rendering of the image by handling different rows in parallel.
 // Command-line arguments** (`argc` and `argv`) are used to determine how many samples per pixel should be used for supersampling.
 int main(int argc, char *argv[]){
 
-  // `w` and `h`**: These define the width (`1024` pixels) and height (`768` pixels) of the image. These values are hardcoded.
+  // `w` and `h`: These define the width (`1024` pixels) and height (`768` pixels) of the image.
 
-  // `samps`**: This defines the number of samples per pixel for supersampling. 
+  // `samps`: This defines the number of samples per pixel for supersampling. 
   // If the user provides a second command-line argument (`argc == 2`), it is used to determine the number of samples. 
   // This value is divided by 4, which seems to be a performance optimization. Otherwise, the default is `1` sample.
 
-  // `cam`**: This defines the camera’s position and direction. 
+  // `cam`: This defines the camera’s position and direction. 
   // The camera is located at `(50, 52, 295.6)` and looks toward the direction `(0, -0.042612, -1)`. 
   // The `norm()` function normalizes the direction vector so it has a magnitude of 1.
 
-  // `cx` and `cy`**: These vectors define the horizontal and vertical direction vectors of the camera’s view plane. 
+  // `cx` and `cy`: These vectors define the horizontal and vertical direction vectors of the camera’s view plane. 
   // They are scaled based on the image resolution (`w`, `h`), and `cx` is adjusted based on the aspect ratio. 
   // `cy` is computed as the perpendicular vector to `cx` in the camera's coordinate system. 
   // These vectors help to map screen space coordinates to 3D world space.
   
-  // `c`**: This is an array of `Vec` objects that will store the RGB color of each pixel in the image. 
-  // The size of this array is `w * h`, and each pixel is initialized to zero.
+  // `c`: This is an array of `Vec` objects that will store the RGB color of each pixel in the image. 
+  // The size of this array is `w * h`, and each pixel is initialised to zero.
 
   int w=1024, h=768, samps = argc==2 ? atoi(argv[1])/4 : 1; // # samples
 
@@ -193,7 +190,7 @@ int main(int argc, char *argv[]){
 
   Vec cx=Vec(w*.5135/h), cy=(cx%cam.d).norm()*.5135, r, *c=new Vec[w*h];
 
-// `#pragma omp parallel for`**: This line enables parallel processing using OpenMP. 
+// `#pragma omp parallel for`: This line enables parallel processing using OpenMP. 
 // The `for` loop that follows is parallelized, meaning each row (`y`) of pixels is computed in parallel by multiple threads, improving performance.
 // `schedule(dynamic, 1)` means that OpenMP will distribute the rows of pixels dynamically among threads. Each thread will process one row at a time and may pick the next available row to process as soon as it finishes a previous one.
 // `private(r)` ensures that each thread gets its own local variable `r` (used to accumulate radiance) during rendering.
@@ -205,27 +202,27 @@ int main(int argc, char *argv[]){
         for (int sy=0, i=(h-y-1)*w+x; sy<2; sy++)     // 2x2 subpixel rows
           for (int sx=0; sx<2; sx++, r=Vec()){        // 2x2 subpixel cols
             
-// **Outer loop (`y`)**: Iterates over each row of pixels (`y` axis).
-// **Inner loop (`x`)**: Iterates over each column of pixels (`x` axis).
-// **Sub-pixel sampling (`sy`, `sx`)**: This part implements 2x2 supersampling for each pixel to reduce aliasing.
+// Outer loop (`y`): Iterates over each row of pixels (`y` axis).
+// Inner loop (`x`): Iterates over each column of pixels (`x` axis).
+// Sub-pixel sampling (`sy`, `sx`): This part implements 2x2 supersampling for each pixel to reduce aliasing.
 // The pixel area is divided into a 2x2 grid, and for each subpixel (sy, sx), the radiance is computed.
             for (int s=0; s<samps; s++){
 
-// **`r1` and `r2`**: These are random numbers generated using `erand48(Xi)`. 
+// `r1` and `r2`: These are random numbers generated using `erand48(Xi)`. 
 // These values are used to add a bit of randomness to the subpixel sampling (for anti-aliasing purposes).
-// **`dx` and `dy`**: These values are computed based on `r1` and `r2` to generate jittered offsets for the subpixel sampling within each pixel. They are used to adjust the ray's direction slightly so that multiple rays sample different parts of the pixel.
+// `dx` and `dy`: These values are computed based on `r1` and `r2` to generate jittered offsets for the subpixel sampling within each pixel. They are used to adjust the ray's direction slightly so that multiple rays sample different parts of the pixel.
 
-// **`Vec d`**: This is the direction vector for the ray. 
+// `Vec d`: This is the direction vector for the ray. 
 // The formula calculates the direction from the camera to the pixel, adding in the jitter from `dx` and `dy`. 
 // `cx` and `cy` scale this direction to the correct position on the image plane. 
 // Then, the camera's direction `cam.d` is added to get the final ray direction.
 
-// **`radiance(Ray(cam.o+d*140, d.norm()), 0, Xi)`**: This is the key function that calculates the radiance (or color) of the pixel. 
+// `radiance(Ray(cam.o+d*140, d.norm()), 0, Xi)`: This is the key function that calculates the radiance (or color) of the pixel. 
 // It generates a ray that starts at the camera’s position (`cam.o`) and moves in the direction `d`. 
 // The `140` factor scales the ray to simulate a large view distance, making sure that the rays travel far enough into the scene. 
 // The `radiance` function is called recursively, calculating the radiance along the path of the ray through the scene.
 
-// **Accumulating Radiance**: The value returned by `radiance` is added to the accumulator `r`, 
+// The value returned by `radiance` is added to the accumulator `r`, 
 // and the result is averaged by dividing by `samps` to account for the number of samples per pixel.
 
               double r1=2*erand48(Xi), dx=r1<1 ? sqrt(r1)-1: 1-sqrt(2-r1);
@@ -234,19 +231,15 @@ int main(int argc, char *argv[]){
                       cy*( ( (sy+.5 + dy)/2 + y)/h - .5) + cam.d;
               r = r + radiance(Ray(cam.o+d*140,d.norm()),0,Xi)*(1./samps);
             } // Camera rays are pushed ^^^^^ forward to start in interior
-// **`clamp(r.x), clamp(r.y), clamp(r.z)`**: This ensures that the color values are within the range `[0, 1]`, which is important for color normalization.
-// **`*.25`**: This is a simple gamma correction (approximated by multiplying by `.25`). 
+// `clamp(r.x), clamp(r.y), clamp(r.z)`: This ensures that the color values are within the range `[0, 1]`, which is important for color normalization.
+// `*.25`: This is a simple gamma correction (approximated by multiplying by `.25`). 
 // It's a form of tone mapping that brightens the colors for display, 
 // as the radiance values can be much larger than 1 due to the accumulation of light from multiple samples.
             c[i] = c[i] + Vec(clamp(r.x),clamp(r.y),clamp(r.z))*.25;
           }
   }
 
-// **Opening the file**: The image is written to a PPM (Portable Pixmap) file named `image.ppm`. 
-// The file is opened for writing in text mode (`"w"`).
-// **`fprintf`**: The header for the PPM format is written: 
-// `P3` (ASCII encoding), followed by the width (`w`), height (`h`), and the maximum color value (255 for 8-bit color).
-// **Writing pixel data**: For each pixel, the RGB values are converted to integers using `toInt()`, and then written to the file in PPM format.
+// Opening the file and saving the image
   FILE *f = fopen("image.ppm", "w");         // Write image to PPM file.
   fprintf(f, "P3\n%d %d\n%d\n", w, h, 255);
   for (int i=0; i<w*h; i++)
