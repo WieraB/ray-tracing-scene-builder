@@ -34,7 +34,7 @@ Solution1: r vector was not initialised to (0, 0, 0) at the beginning of each lo
 
 
 
-Original smallpt.cpp (1) modifications - main1.cpp:
+Original smallpt.cpp modifications:
 *  Corrected this warning
 "main.cpp: In function ‘int main(int, char**)’:
 main.cpp:123:46: warning: narrowing conversion of ‘((y * y) * y)’ from ‘int’ to ‘short unsigned int’ [-Wnarrowing]
@@ -43,7 +43,12 @@ main.cpp:123:46: warning: narrowing conversion of ‘((y * y) * y)’ from ‘in
 * Changed some if-else structures from one liners to a readable indented structure
 * Added the option to create a triangle in the scene
 * Added .obj files import and processing
+* Amended camera settings to add Field of View (FOV)
 
+
+To do:
+* Remove recursion
+* Implement Bounding Volume Hierarchy (BVH)
 
 Some links:
 https://libeigen.gitlab.io/eigen/docs-nightly/GettingStarted.html

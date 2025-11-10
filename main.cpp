@@ -66,9 +66,9 @@ struct Triangle {
 };
 
 Sphere spheres[] = {//Scene: radius, position, emission, color, material
-  Sphere(600, Eigen::Vector3d(50, 681.6-.27, 81.6),Eigen::Vector3d(12,12,12), Eigen::Vector3d(0, 0, 0),     DIFF), //Light
-  Sphere(6, Eigen::Vector3d(-0.006, -5.0, -1.3),    Eigen::Vector3d(0, 0, 0),Eigen::Vector3d(1,1,1)*.999, REFR),//Glass
-  Sphere(100, Eigen::Vector3d(-200, -5.0, -200),     Eigen::Vector3d(0, 0, 0),  Eigen::Vector3d(.75,.75,.75), DIFF),//Back
+  Sphere(600, Eigen::Vector3d(50, 681.6-.27, 81.6), Eigen::Vector3d(12,12,12), Eigen::Vector3d(0, 0, 0),     DIFF), //Light
+  Sphere(6, Eigen::Vector3d(-0.006, -5.0, -1.3),    Eigen::Vector3d(0, 0, 0),  Eigen::Vector3d(1,1,1)*.999,  REFR),//Glass
+  Sphere(100, Eigen::Vector3d(-200, -5.0, -200),    Eigen::Vector3d(0, 0, 0),  Eigen::Vector3d(.75,.75,.75), DIFF),//Back
 };
 
 // Triangle triangles[] = {
@@ -234,11 +234,11 @@ int main(int argc,char *argv[]){
 
   Ray cam(camPos, camDir);
 
-  Eigen::Vector3d right = cam.d.cross(Eigen::Vector3d(0, 1, 0)).normalized();
-  Eigen::Vector3d up = right.cross(cam.d).normalized();
+  Eigen::Vector3d right = cam.d.cross(Eigen::Vector3d(0, 1, 0)).normalized(); // orthonormal camera basis
+  Eigen::Vector3d up = right.cross(cam.d).normalized(); // orthonormal camera basis
 
-  Eigen::Vector3d cx = right * aspect_ratio * scale;
-  Eigen::Vector3d cy = up * scale;
+  Eigen::Vector3d cx = right * aspect_ratio * scale; // scale the orthogonal basis
+  Eigen::Vector3d cy = up * scale; // scale the orthogonal basis
   
   Eigen::Vector3d r=Eigen::Vector3d(0, 0, 0);
   std::vector<Eigen::Vector3d, Eigen::aligned_allocator<Eigen::Vector3d>> c(w*h);
