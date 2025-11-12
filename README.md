@@ -47,8 +47,14 @@ main.cpp:123:46: warning: narrowing conversion of ‘((y * y) * y)’ from ‘in
 
 
 To do:
-* Remove recursion
+* Remove recursion (try stacks)
 * Implement Bounding Volume Hierarchy (BVH)
+* Camera settings
+* Check how to verify the output correctness
+* Try it on deformation example
+
+"Ray Casting Curved-Quadratic Elements" paper
+
 
 Some links:
 https://libeigen.gitlab.io/eigen/docs-nightly/GettingStarted.html
