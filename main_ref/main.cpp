@@ -12,6 +12,7 @@
 #include "ray.h"
 #include "load.h"
 #include "misc.h"
+#include "camera.h"
 
 // #define EIGEN_USE_MKL_ALL
 // #define EIGEN_USE_BLAS
