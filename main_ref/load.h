@@ -11,7 +11,7 @@
 #include <sstream>
 #include <iostream>
 
-#include "hittable.h"
+#include "intersectable.h"
 
 #define EIGEN_NO_DEBUG
 
@@ -71,7 +71,7 @@ bool loadSpheres(const std::string &filename, std::vector<Sphere> &sph) {
       sph.emplace_back(rad, Eigen::Vector3d(px, py, pz), Eigen::Vector3d(ex, ey, ez), Eigen::Vector3d(cx, cy, cz), stringToRefl(refl_s));
     }
   }
-  
+
   std::cerr << "Loaded " << sph.size() << " spheres from " << filename << "\n";
   return true;
 }

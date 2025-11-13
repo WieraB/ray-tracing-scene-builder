@@ -8,7 +8,7 @@
 #include <sstream>
 #include <iostream>
 
-#include "hittable.h"
+#include "intersectable.h"
 #include "ray.h"
 #include "load.h"
 #include "misc.h"
@@ -19,6 +19,10 @@
 
 int main(int argc,char *argv[]){
   int w=512,h=384,samps = argc >= 4 ? atoi (argv[3]) / 4 : 1;
+
+  // std::vector<Sphere> spheres;
+
+  // std::vector<Triangle> triangles;
 
   if(argc >= 2) loadOBJ(argv[1], triangles);
   if(argc >= 3) loadSpheres(argv[2], spheres);
