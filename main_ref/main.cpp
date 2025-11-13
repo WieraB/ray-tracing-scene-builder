@@ -24,8 +24,12 @@ int main(int argc,char *argv[]){
 
   // std::vector<Triangle> triangles;
 
-  if(argc >= 2) loadOBJ(argv[1], triangles);
-  if(argc >= 3) loadSpheres(argv[2], spheres);
+  intersectable_list scene;
+
+  if(argc >= 2) loadOBJ(argv[1], scene);
+  if(argc >= 3) loadSpheres(argv[2], scene);
+
+  std::cout << "Scene size : " << scene.size();
 
   double fov = 20;  // Vertical view angle (field of view)
   auto theta = degrees_to_radians(fov);
@@ -61,7 +65,7 @@ int main(int argc,char *argv[]){
               double r2=2*erand48(Xi), dy=r2<1 ? sqrt(r2)-1: 1-sqrt(2-r2);
               Eigen::Vector3d d = cx*( ( (sx+.5 + dx)/2 + x)/w - .5) +
                       cy*( ( (sy+.5 + dy)/2 + y)/h - .5) + cam.d;
-              r = r + radiance(Ray(cam.o+d*140,d.normalized()),0,Xi)*(1./samps);
+              r = r + radiance(Ray(cam.o+d*140,d.normalized()),0,Xi, scene)*(1./samps);
             }
             c[i] = c[i] + Eigen::Vector3d(clamp(r.x()),clamp(r.y()),clamp(r.z()))*.25;
           }

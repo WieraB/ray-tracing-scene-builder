@@ -10,12 +10,14 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <memory>
 
 #include "intersectable.h"
 
 #define EIGEN_NO_DEBUG
 
-bool loadOBJ(const std::string &filename, std::vector<Triangle> &tris) {
+bool loadOBJ(const std::string &filename, intersectable_list &scene) {
+  int scene_size_0 = scene.size();
   std::ifstream in(filename);
   if(!in) {
     std::cerr << "Cannot open OBJ file: " << filename << "\n";
@@ -38,15 +40,17 @@ bool loadOBJ(const std::string &filename, std::vector<Triangle> &tris) {
       };
       int i0=idx(v1), i1=idx(v2), i2=idx(v3);
       if(i0<0||i1<0||i2<0||i0>=verts.size()||i1>=verts.size()||i2>=verts.size()) continue;
-      tris.emplace_back(verts[i0], verts[i1], verts[i2],
-                        Eigen::Vector3d(0, 0, 0), Eigen::Vector3d(1,1,0)*.8, DIFF);
+      
+      scene.add(std::make_shared<Triangle>(verts[i0], verts[i1], verts[i2],
+                        Eigen::Vector3d(0, 0, 0), Eigen::Vector3d(1,1,0)*.8, DIFF));
     }
   }
-  std::cerr << "Loaded " << tris.size() << " triangles from " << filename << "\n";
+  std::cerr << "Loaded " << scene.size() - scene_size_0 << " triangles from " << filename << "\n";
   return true;
 }
 
-bool loadSpheres(const std::string &filename, std::vector<Sphere> &sph) {
+bool loadSpheres(const std::string &filename, intersectable_list &scene) {
+  int scene_size_0 = scene.size();
   std::ifstream in(filename);
   if(!in) {
     std::cerr << "Cannot open OBJ file: " << filename << "\n";
@@ -68,11 +72,12 @@ bool loadSpheres(const std::string &filename, std::vector<Sphere> &sph) {
       iss >> cx >> cy >> cz;
       iss >> refl_s;
 
-      sph.emplace_back(rad, Eigen::Vector3d(px, py, pz), Eigen::Vector3d(ex, ey, ez), Eigen::Vector3d(cx, cy, cz), stringToRefl(refl_s));
+      scene.add(std::make_shared<Sphere>(rad, Eigen::Vector3d(px, py, pz), 
+            Eigen::Vector3d(ex, ey, ez), Eigen::Vector3d(cx, cy, cz), stringToRefl(refl_s)));
     }
   }
 
-  std::cerr << "Loaded " << sph.size() << " spheres from " << filename << "\n";
+  std::cerr << "Loaded " << scene.size() - scene_size_0 << " spheres from " << filename << "\n";
   return true;
 }
 

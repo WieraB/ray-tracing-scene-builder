@@ -10,6 +10,7 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <memory>
 
 #include "ray.h"
 
@@ -96,52 +97,65 @@ class Triangle : public intersectable {
     }
 };
 
-std::vector<Sphere> spheres;
+// List of objects in the scene
+// Intersect function check if the specific ray intersect any objects in the scene,
+// then it returns the information about the intersection closest to the camera.
+class intersectable_list {
+  private:
+    std::vector<std::shared_ptr<intersectable>> objects;
 
-std::vector<Triangle> triangles;
+  public:
+    intersectable_list() {};
+    virtual ~intersectable_list() = default;
 
-inline bool intersect(const Ray &r, double &t, int &id, bool &isTri, Eigen::Vector3d &n,
-std::vector<Sphere> &spheres, std::vector<Triangle> triangles) {
-  double inf=t=1e20;
-  isTri=false;
-  double d;
-  for (int i=0; i<(int)spheres.size(); i++) {
-    Eigen::Vector3d n_tmp;
-    if ((d=spheres[i].intersect(r, n_tmp)) && d<t) { t=d; id=i; isTri=false; n=n_tmp; }
-  }
-  for (int i=0; i<(int)triangles.size(); i++) {
-    Eigen::Vector3d n_tmp;
-    if ((d=triangles[i].intersect(r, n_tmp)) && d<t) {
-      t=d; id=i; isTri=true; n=n_tmp;
+    void clear() { objects.clear(); }
+
+    void add(std::shared_ptr<intersectable> object) {
+      objects.push_back(object);
     }
-  }
-  return t<inf;
-}
 
-Eigen::Vector3d radiance(const Ray &r, int depth, unsigned short *Xi){
+    int size() { return objects.size(); }
+
+    const std::shared_ptr<intersectable>& operator[](size_t i) const {
+        return objects[i];
+    }
+
+    inline bool intersect(const Ray &r, double &t, int &id, Eigen::Vector3d &n) {
+      double inf=t=1e20;
+      double d;
+    
+      for (int i=0; i<(int)size(); i++) {
+        Eigen::Vector3d n_tmp;
+        if ((d=objects[i] -> intersect(r, n_tmp)) && d<t) {
+           t=d; id=i; n=n_tmp;
+        }
+      }
+    
+      return t<inf;
+    }
+
+    // void add_block(std::vector<std::shared_ptr<intersectable>> objects_) {
+    //   objects.insert( objects.end(), objects_.begin(), objects_.end() );
+    // }
+
+};
+
+Eigen::Vector3d radiance(const Ray &r, int depth, unsigned short *Xi, intersectable_list &scene){
 
   double t;                               // distance to intersection
   int id=0;                               // id of intersected object
-  bool isTri=false;
   Eigen::Vector3d n;
 
-  if (!intersect(r, t, id, isTri, n, spheres, triangles)) return Eigen::Vector3d(0, 0, 0); // if miss, return black
+  if (!scene.intersect(r, t, id, n)) return Eigen::Vector3d(0, 0, 0); // if miss, return black
   Eigen::Vector3d x = r.o + r.d * t;
   Eigen::Vector3d nl = n.dot(r.d) < 0 ? n : n * -1; // Adjust normal direction
   Eigen::Vector3d f, e;
   Refl_t refl;
 
-  if (!isTri) {
-    const Sphere &obj=spheres[id];
-    f=obj.c; 
-    e=obj.e; 
-    refl=obj.refl;
-  } else {
-    const Triangle &obj=triangles[id];
-    f=obj.c; 
-    e=obj.e; 
-    refl=obj.refl;
-  }
+  const std::shared_ptr<intersectable> &obj = scene[id];
+  f=obj -> c; 
+  e=obj -> e; 
+  refl=obj -> refl;
   
   double p = f.x()>f.y() && f.x()>f.z() ? f.x() : f.y()>f.z() ? f.y() : f.z(); // max refl
 
@@ -164,11 +178,11 @@ Eigen::Vector3d radiance(const Ray &r, int depth, unsigned short *Xi){
     Eigen::Vector3d d = u * std::cos(r1) * r2s + v * std::sin(r1) * r2s + w * std::sqrt(1 - r2);
     d.normalize();
 
-    return e + f.cwiseProduct(radiance(Ray(x,d),depth,Xi));
+    return e + f.cwiseProduct(radiance(Ray(x,d),depth,Xi, scene));
 
   } 
   else if (refl == SPEC)            // Ideal SPECULAR reflection
-    return e + f.cwiseProduct(radiance(Ray(x,r.d-n*2*n.dot(r.d)),depth,Xi));
+    return e + f.cwiseProduct(radiance(Ray(x,r.d-n*2*n.dot(r.d)),depth,Xi, scene));
 
   Ray reflRay(x, r.d-n*2*n.dot(r.d));     // Ideal dielectric REFRACTION
   
@@ -177,7 +191,7 @@ Eigen::Vector3d radiance(const Ray &r, int depth, unsigned short *Xi){
   double nc=1, nt=1.5, nnt=into?nc/nt:nt/nc, ddn=r.d.dot(nl), cos2t;
 
   if ((cos2t=1-nnt*nnt*(1-ddn*ddn))<0)    // Total internal reflection
-    return e + f.cwiseProduct(radiance(reflRay,depth,Xi));
+    return e + f.cwiseProduct(radiance(reflRay,depth,Xi, scene));
   
   Eigen::Vector3d tdir = (r.d * nnt - n * ((into ? 1 : -1) * (ddn * nnt + std::sqrt(cos2t))));
   tdir.normalize();
@@ -190,15 +204,15 @@ Eigen::Vector3d radiance(const Ray &r, int depth, unsigned short *Xi){
   if (depth > 2) {
         if (erand48(Xi) < P) {
             // If we continue with the ray, calculate reflected radiance
-            return e + f.cwiseProduct(radiance(reflRay, depth, Xi) * RP);
+            return e + f.cwiseProduct(radiance(reflRay, depth, Xi, scene) * RP);
         } else {
             // Otherwise calculate transmitted radiance
-            return e + f.cwiseProduct(radiance(Ray(x,tdir), depth, Xi) * TP);
+            return e + f.cwiseProduct(radiance(Ray(x,tdir), depth, Xi, scene) * TP);
         }
     } else {
         // For depth <= 2, we compute the usual reflection + transmission
-        return e + f.cwiseProduct(radiance(reflRay, depth, Xi) * Re) + 
-                        f.cwiseProduct(radiance(Ray(x,tdir), depth, Xi) * Tr);
+        return e + f.cwiseProduct(radiance(reflRay, depth, Xi, scene) * Re) + 
+                        f.cwiseProduct(radiance(Ray(x,tdir), depth, Xi, scene) * Tr);
   }
 
 }
