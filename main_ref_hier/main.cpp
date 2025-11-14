@@ -26,10 +26,12 @@ int main(int argc,char *argv[]){
 
   intersectable_list scene;
 
-  // auto world = intersectable_list(std::make_shared<bvh_node>(scene));
-
   if(argc >= 2) loadOBJ(argv[1], scene);
   if(argc >= 3) loadSpheres(argv[2], scene);
+
+  // auto world = intersectable_list(std::make_shared<bvh_node>(scene));
+
+  // scene = intersectable_list(std::make_shared<bvh_node>(scene));
 
   std::cout << "Scene size : " << scene.size();
 

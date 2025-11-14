@@ -22,6 +22,7 @@ class bvh_node : public intersectable {
         bbox = aabb::empty;
         for (size_t object_index=start; object_index < end; object_index++)
             bbox = aabb(bbox, objects[object_index]->bounding_box());
+        // std::cout << " Object size: "<< start << " and " <<  end << " and size " << objects.size() << ". \n";
 
         int axis = bbox.longest_axis();
 
