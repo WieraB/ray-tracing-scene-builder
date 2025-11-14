@@ -49,7 +49,7 @@ class intersectable {
     Eigen::Vector3d c_ = Eigen::Vector3d(0,0,0), Refl_t refl_=DIFF):
     e(e_), c(c_), refl(refl_) {};
 
-    virtual bool intersect(const Ray &r, intersect_record &rec) const = 0;
+    virtual bool intersect(const Ray &r, interval ray_t, intersect_record &rec) const = 0;
 
     aabb bounding_box() const { return bbox; };
 
@@ -69,7 +69,7 @@ class Sphere : public intersectable {
         bbox = aabb(p_ - disp, p_ + disp);
     }
 
-    bool intersect(const Ray &r, intersect_record &rec) const override { // returns distance, 0 if no hit
+    bool intersect(const Ray &r, interval ray_t, intersect_record &rec) const override { // returns distance, 0 if no hit
       Eigen::Vector3d op = p-r.o; // Solve t^2*d.d + 2*t*(o-p).d + (o-p).(o-p)-R^2 = 0
       double t, eps=1e-4, b=op.dot(r.d), det=b*b-op.dot(op)+rad*rad;
       if (det<0) return 0; else det=sqrt(det);
@@ -127,7 +127,7 @@ class Triangle : public intersectable {
 
       }
   
-    bool intersect(const Ray &r, intersect_record &rec) const override {
+    bool intersect(const Ray &r, interval ray_t, intersect_record &rec) const override {
       const double eps = 1e-5;
       Eigen::Vector3d edge1 = v1 - v0, edge2 = v2 - v0;
       Eigen::Vector3d pvec = r.d.cross(edge2);
@@ -159,8 +159,11 @@ class Triangle : public intersectable {
 class intersectable_list : public intersectable {
 
   public:
-  std::vector<std::shared_ptr<intersectable>> objects;
+    std::vector<std::shared_ptr<intersectable>> objects;
     intersectable_list() {};
+    intersectable_list(std::shared_ptr<intersectable> object) { add(object); }
+
+
     virtual ~intersectable_list() = default;
 
     void clear() { objects.clear(); }
@@ -176,7 +179,7 @@ class intersectable_list : public intersectable {
         return objects[i];
     }
 
-    bool intersect(const Ray &r, intersect_record &rec) const override {
+    bool intersect(const Ray &r, interval ray_t, intersect_record &rec) const override {
       
       double t;
       double inf=t=1e20;
@@ -184,7 +187,7 @@ class intersectable_list : public intersectable {
     
       for (int i=0; i<(int)size(); i++) {
         intersect_record rec_temp;
-        if (objects[i] -> intersect(r, rec_temp) && rec_temp.t<t) {
+        if (objects[i] -> intersect(r, ray_t, rec_temp) && rec_temp.t<t) {
            t=rec_temp.t;
            rec = rec_temp;
         }

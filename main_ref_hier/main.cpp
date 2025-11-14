@@ -7,6 +7,7 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <memory>
 
 #include "intersectable.h"
 #include "ray.h"
@@ -14,6 +15,7 @@
 #include "misc.h"
 #include "camera.h"
 #include "aabb.h"
+#include "bvh.h"
 
 // #define EIGEN_USE_MKL_ALL
 // #define EIGEN_USE_BLAS
@@ -22,11 +24,9 @@
 int main(int argc,char *argv[]){
   int w=512,h=384,samps = argc >= 4 ? atoi (argv[3]) / 4 : 1;
 
-  // std::vector<Sphere> spheres;
-
-  // std::vector<Triangle> triangles;
-
   intersectable_list scene;
+
+  // auto world = intersectable_list(std::make_shared<bvh_node>(scene));
 
   if(argc >= 2) loadOBJ(argv[1], scene);
   if(argc >= 3) loadSpheres(argv[2], scene);

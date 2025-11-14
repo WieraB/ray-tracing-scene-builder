@@ -20,8 +20,9 @@
 Eigen::Vector3d radiance(const Ray &r, int depth, unsigned short *Xi, intersectable_list &scene){
 
   intersect_record rec;
+  interval ray_t;
 
-  if (!scene.intersect(r, rec)) return Eigen::Vector3d(0, 0, 0); // if miss, return black
+  if (!scene.intersect(r, ray_t, rec)) return Eigen::Vector3d(0, 0, 0); // if miss, return black
   Eigen::Vector3d n = rec.n_out;
   double t = rec.t; // distance to intersection
   Eigen::Vector3d x = r.o + r.d * t;
