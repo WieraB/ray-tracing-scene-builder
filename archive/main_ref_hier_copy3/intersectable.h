@@ -28,6 +28,7 @@ struct intersect_record {
   double t;
   Eigen::Vector3d e, c;      // emission, colour
   Refl_t refl;      // reflection type (DIFFuse, SPECular, REFRactive)
+  int id;
   
 };
 
@@ -37,32 +38,26 @@ struct intersect_record {
 // and the normal vector at the intersection point. 
 class intersectable {
 
-  protected:
+  public:
     Eigen::Vector3d e, c;      // emission, colour
     Refl_t refl;      // reflection type (DIFFuse, SPECular, REFRactive)
     aabb bbox;  // bounding box
-
-  public:
     virtual ~intersectable() = default;
 
-    intersectable(Eigen::Vector3d e_ =Eigen::Vector3d(0,0,0),
-    Eigen::Vector3d c_ = Eigen::Vector3d(0,0,0), Refl_t refl_=DIFF):
+    intersectable(Eigen::Vector3d e_, Eigen::Vector3d c_, Refl_t refl_):
     e(e_), c(c_), refl(refl_) {};
 
     virtual bool intersect(const Ray &r, intersect_record &rec) const = 0;
-
-    aabb bounding_box() const { return bbox; };
 
 };
 
 // Additional radius and centre poistion parameters
 class Sphere : public intersectable {
 
-  private:
+  public:
     double rad;       // radius
     Eigen::Vector3d p;      // position
 
-  public:
     Sphere(double rad_, Eigen::Vector3d p_, Eigen::Vector3d e_, Eigen::Vector3d c_, Refl_t refl_):
     intersectable(e_, c_, refl_), rad(rad_), p(p_) {
         Eigen::Vector3d disp = Eigen::Vector3d(rad_, rad_, rad_);
@@ -104,10 +99,9 @@ class Sphere : public intersectable {
 // Additional coorinates of 3 triangle verticies
 class Triangle : public intersectable {
 
-  private:
+  public:
     Eigen::Vector3d v0, v1, v2;
   
-  public:
     Triangle(Eigen::Vector3d v0_, Eigen::Vector3d v1_, Eigen::Vector3d v2_, Eigen::Vector3d e_, Eigen::Vector3d c_, Refl_t refl_):
       intersectable(e_, c_, refl_), v0(v0_), v1(v1_), v2(v2_) {
 
@@ -156,7 +150,9 @@ class Triangle : public intersectable {
 // List of objects in the scene
 // Intersect function check if the specific ray intersects any objects in the scene,
 // then it returns the information about the intersection closest to the camera.
-class intersectable_list : public intersectable {
+class intersectable_list {
+  private:
+    aabb bbox;
 
   public:
   std::vector<std::shared_ptr<intersectable>> objects;
@@ -167,16 +163,16 @@ class intersectable_list : public intersectable {
 
     void add(std::shared_ptr<intersectable> object) {
       objects.push_back(object);
-      bbox = aabb(bbox, object -> bounding_box());
+      bbox = aabb(bbox, object -> bbox);
     }
 
-    int size() const { return objects.size(); }
+    int size() { return objects.size(); }
 
     const std::shared_ptr<intersectable>& operator[](size_t i) const {
         return objects[i];
     }
 
-    bool intersect(const Ray &r, intersect_record &rec) const override {
+    inline bool intersect(const Ray &r, intersect_record &rec) {
       
       double t;
       double inf=t=1e20;
@@ -187,6 +183,7 @@ class intersectable_list : public intersectable {
         if (objects[i] -> intersect(r, rec_temp) && rec_temp.t<t) {
            t=rec_temp.t;
            rec = rec_temp;
+           rec.id = i;
         }
       }
     

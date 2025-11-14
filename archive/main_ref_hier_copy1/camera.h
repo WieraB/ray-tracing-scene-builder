@@ -19,16 +19,20 @@
 
 Eigen::Vector3d radiance(const Ray &r, int depth, unsigned short *Xi, intersectable_list &scene){
 
-  intersect_record rec;
+  double t;                               // distance to intersection
+  int id=0;                               // id of intersected object
+  Eigen::Vector3d n;
 
-  if (!scene.intersect(r, rec)) return Eigen::Vector3d(0, 0, 0); // if miss, return black
-  Eigen::Vector3d n = rec.n_out;
-  double t = rec.t; // distance to intersection
+  if (!scene.intersect(r, t, id, n)) return Eigen::Vector3d(0, 0, 0); // if miss, return black
   Eigen::Vector3d x = r.o + r.d * t;
   Eigen::Vector3d nl = n.dot(r.d) < 0 ? n : n * -1; // Adjust normal direction
-  Refl_t refl = rec.refl;
-  Eigen::Vector3d f = rec.c; 
-  Eigen::Vector3d e = rec.e; 
+  Eigen::Vector3d f, e;
+  Refl_t refl;
+
+  const std::shared_ptr<intersectable> &obj = scene[id];
+  f=obj -> c; 
+  e=obj -> e; 
+  refl=obj -> refl;
   
   double p = f.x()>f.y() && f.x()>f.z() ? f.x() : f.y()>f.z() ? f.y() : f.z(); // max refl
 

@@ -44,6 +44,8 @@ main.cpp:123:46: warning: narrowing conversion of ‘((y * y) * y)’ from ‘in
 * Added the option to create a triangle in the scene
 * Added .obj files import and processing
 * Amended camera settings to add Field of View (FOV)
+* Refactored the code to add intersectable class
+* Refactored the code to add intersectable class
 
 
 To do:
@@ -54,7 +56,6 @@ To do:
 * Try it on deformation example
 
 "Ray Casting Curved-Quadratic Elements" paper
-
 
 Some links:
 https://libeigen.gitlab.io/eigen/docs-nightly/GettingStarted.html
