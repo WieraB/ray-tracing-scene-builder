@@ -53,6 +53,8 @@ class bvh_node : public intersectable {
         bool hit_left = left->intersect(r, ray_t, rec);
         bool hit_right = right->intersect(r, interval(ray_t.min, hit_left ? rec.t : ray_t.max), rec);
 
+        std::cout << "Intersections: " << hit_left << " and " << hit_right << ". \n";
+
         return hit_left || hit_right;
     }
 

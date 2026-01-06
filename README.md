@@ -45,7 +45,6 @@ main.cpp:123:46: warning: narrowing conversion of ‘((y * y) * y)’ from ‘in
 * Added .obj files import and processing
 * Amended camera settings to add Field of View (FOV)
 * Refactored the code to add intersectable class
-* Refactored the code to add intersectable class
 
 
 To do:
