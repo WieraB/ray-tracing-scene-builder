@@ -61,3 +61,4 @@ https://libeigen.gitlab.io/eigen/docs-nightly/GettingStarted.html
 https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html
 
 
+./main cow.obj spheres_cow.txt

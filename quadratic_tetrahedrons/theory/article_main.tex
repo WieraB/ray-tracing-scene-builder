@@ -1,0 +1,123 @@
+
+\documentclass[preprint,12pt]{interact}
+
+\usepackage{amssymb}
+
+\usepackage{amsmath}
+\usepackage{bm}
+
+\usepackage{float}
+\floatstyle{plaintop}
+\restylefloat{table}
+\usepackage{caption}
+\captionsetup[table]{singlelinecheck=off, justification=raggedright}
+\usepackage{tablefootnote}
+\usepackage{threeparttable}
+\usepackage{adjustbox}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{subcaption}
+\captionsetup[subfigure]{justification=centering}
+
+
+\begin{document}
+
+\begin{frontmatter}
+
+
+
+\title{Ray tracing – Curved quadratic elements}
+
+
+
+\end{frontmatter}
+
+\section{Intersection problem}\label{intersect}
+
+Surface position on the tetrahedron's face (weighted sum of shape functions):
+\begin{align}
+	P(g,h) = \sum_{i-0}^{5} N_i(g,h) \cdot f_{nodes_i}
+\end{align}
+
+Ray:
+\begin{align}
+	R(t) = \bm{o} + t \bm{d}
+\end{align}
+where $\bm{d}$ is the ray's direction, and $\bm{o}$ is the ray's origin
+
+Face-ray intersection (3 unknowns):
+\begin{align}
+	\bm{o} + t \bm{d} - P(g,h) = 0
+\end{align}
+
+Nonlinear system of equations:
+\begin{align}
+	F(t,g,h) = \bm{o} + t \bm{d} - \sum_{i-0}^{5} N_i(g,h) \cdot f_{nodes_i} = \bm{0}
+\end{align}
+
+\section{Möller-Trumbore algorithm for linear triangle intersection (initial guess)}\label{MT}
+
+\begin{align}
+	\bm{E_1} = V_1 - V_0, \; \bm{E_2} = V_2 - V_0 \\
+	\bm{p} = \bm{d} \times \bm{E_2} \\
+	det = \bm{E_1} \cdot \bm{p} \\
+	\bm{t_{vec}} = \bm{o} - V_0
+\end{align}
+Where $V_0$, $V_1$, $V_2$ are triangle vertices.
+
+\begin{align}
+	u = \frac{\bm{t_{vec}} \cdot \bm{p} }{det}
+\end{align}
+
+\begin{align}
+	\bm{q} = \bm{t_{vec}} \times \bm{E_1}
+\end{align}
+
+\begin{align}
+	v = \frac{\bm{d} \cdot \bm{q} }{det}
+\end{align}
+
+\begin{align}
+	t = \frac{\bm{E_2} \cdot \bm{q} }{det}
+\end{align}
+
+
+\section{Newton-Raphson}\label{NR}
+
+Jacobian of $F$:
+\begin{align}
+	\bm{J_F} = \left[  \frac{\partial F}{\partial f}, \frac{\partial F}{\partial g}, \frac{\partial F}{\partial h} \right] \\
+	\bm{J_F} = \left[  \bm{d}, -\frac{\partial P}{\partial g}, -\frac{\partial P}{\partial h} \right]
+\end{align}
+
+\begin{align}
+	\frac{\partial P}{\partial g} = \sum_{i-0}^{5} \frac{\partial N_i}{\partial g} \cdot f_{nodes_i} \\
+	\frac{\partial P}{\partial h} = \sum_{i-0}^{5} \frac{\partial N_i}{\partial h} \cdot f_{nodes_i}
+\end{align}
+
+The update by solving a linear system:
+\begin{align}
+	\bm{\Delta} = \left[ \Delta t, \Delta g, \Delta h \right]^T \\
+	\bm{J_F} \cdot \bm{\Delta} = -F(t, g, h)
+\end{align}
+
+\begin{align}
+\begin{bmatrix}
+	\bm{d}_x & -\frac{\partial P_x}{\partial g} & -\frac{\partial P_x}{\partial h} \\
+	\bm{d}_y & -\frac{\partial P_y}{\partial g} & -\frac{\partial P_y}{\partial h} \\
+	\bm{d}_z & -\frac{\partial P_z}{\partial g} & -\frac{\partial P_z}{\partial h} 
+\end{bmatrix} 
+\begin{bmatrix}
+	\Delta t \\
+	\Delta g \\
+	\Delta h
+\end{bmatrix} = - (\bm{o} + t \bm{d} - P(g,h))
+\end{align}
+
+
+
+\end{document}
+
+\endinput
+
