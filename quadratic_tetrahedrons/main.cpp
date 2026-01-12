@@ -181,19 +181,27 @@ struct Quadratic_tet {
     Refl_t refl;
 
     // Nodes for the 4 faces - each face has 6 nodes: 3 corners, 3 mid-edges
-    // Face indices based on standard 10-node tetrahedron numbering
-    const int face_indices[4][6] = {
-        {0, 2, 1, 6, 5, 4}, // Face 0 (bottom)
-        {0, 1, 3, 4, 8, 7}, // Face 1
-        {1, 2, 3, 5, 9, 8}, // Face 2
-        {2, 0, 3, 6, 7, 9}  // Face 3
-    };
+    // Numbering for 1 tetrahedron example
+    // const int face_indices[4][6] = {
+    //     {0, 2, 1, 6, 5, 4}, // Face 0 (bottom)
+    //     {0, 1, 3, 4, 8, 7}, // Face 1
+    //     {1, 2, 3, 5, 9, 8}, // Face 2
+    //     {2, 0, 3, 6, 7, 9}  // Face 3
+    // };
+
+      // Correct numbering for NGSolve/Netgen
+      const int face_indices[4][6] = {
+      {0, 1, 2, 4, 7, 5}, // Face 0 (bottom) (v0, v1, v2)
+      {0, 1, 3, 4, 8, 6}, // Face 1 (v0, v1, v3)
+      {1, 2, 3, 7, 9, 8}, // Face 2 (v1, v2, v3)
+      {0, 2, 3, 5, 9, 6}  // Face 3 (v0, v2, v3)
+      };
 
     Quadratic_tet(std::vector<Eigen::Vector3d> nodes_, Eigen::Vector3d e_, Eigen::Vector3d c_, Refl_t refl_) :
         nodes(nodes_), e(e_), c(c_), refl(refl_) {}
 
-    // Quadratic Triangle Shape Functions (u, v)
-    // w = 1 - u - v
+    // Quadratic triangle shape functions (g, h)
+    // r = 1 - g - h
     static Eigen::VectorXd get_face_N(double g, double h) {
         double r = 1.0 - g - h;
         Eigen::VectorXd N(6);
@@ -203,7 +211,7 @@ struct Quadratic_tet {
 
     static Eigen::Matrix<double, 3, 2> get_face_Jacobian(double g, double h, const std::vector<Eigen::Vector3d>& f_nodes) {
         double r = 1.0 - g - h;
-        // Derivatives of N w.r.t u and v
+        // Derivatives of N wrt g and h
         double dNdu[6] = { -(4*r-1), 4*g-1, 0, 4*(r-g), 4*h, -4*h };
         double dNdv[6] = { -(4*r-1), 0, 4*h-1, -4*g, 4*g, 4*(r-h) };
 
@@ -218,14 +226,14 @@ struct Quadratic_tet {
     double intersect(const Ray &r, Eigen::Vector3d &n_out) const {
       const double eps = 1e-8;  
       double min_t = 1e20;
-        bool intersect = false;
+      bool intersect = false;
 
         // Iterate through each of the 4 faces
         for (int f = 0; f < 4; ++f) {
             std::vector<Eigen::Vector3d> f_nodes(6);
             for(int i=0; i<6; ++i) f_nodes[i] = nodes[face_indices[f][i]];
 
-            // 1. Intersect ray with the plane defined by 3 corner nodes to get the initial guess
+            // 1. Intersect ray with the plane defined by 3 corner nodes to get the initial guess for t
             // Use the code already used for Traingle structure.
             Eigen::Vector3d v0 = f_nodes[0], v1 = f_nodes[1], v2 = f_nodes[2];
             Eigen::Vector3d edge1 = v1 - v0, edge2 = v2 - v0;
@@ -253,7 +261,7 @@ struct Quadratic_tet {
 
                 Eigen::Vector3d res = r.o + t * r.d - P;
                 if (res.norm() < 1e-7) {
-                    if (gh.x() >= -0.01 && gh.y() >= -0.01 && (gh.x() + gh.y()) <= 1.01) {
+                    if (gh.x() >= -0.0 && gh.y() >= -0.0 && (gh.x() + gh.y()) <= 1.0) {
                         if (t < min_t && t > 1e-4) {
                             min_t = t;
                             Eigen::Matrix<double, 3, 2> J = get_face_Jacobian(gh.x(), gh.y(), f_nodes);
@@ -367,21 +375,21 @@ Quadric_element quadratic_elements[] = {//Scene: radius, position, emission, col
 // };
 
 
-Quadratic_tet quadratic_tets[] = {//Scene: radius, position, emission, color, material
-Quadratic_tet({
-  Eigen::Vector3d(6.000,	0.000,	-2.121),
-  Eigen::Vector3d(-3.000,	5.196,	-2.121),
-  Eigen::Vector3d(-3.000,	-5.196,	-2.121),
-  Eigen::Vector3d(0.000,	0.000,	6.000),
-  Eigen::Vector3d(1.500,	2.598,	-2.121) + Eigen::Vector3d(0.00,	0.00,	2.0),
-  Eigen::Vector3d(-3.000,	0.000,	-2.121),
-  Eigen::Vector3d(1.500,	-2.598,	-2.121) + Eigen::Vector3d(0.00,	0.00,	2.0),
-  Eigen::Vector3d(3.000,	0.000,	1.940),
-  Eigen::Vector3d(-1.5,	2.598,	1.940),
-  Eigen::Vector3d(-1.5,	-2.598,	1.940)
-}, 
-  Eigen::Vector3d(0, 0, 0), Eigen::Vector3d(1.0, 0.078, 0.576), DIFF)
-};
+// Quadratic_tet quadratic_tets[] = {//Scene: radius, position, emission, color, material
+// Quadratic_tet({
+//   Eigen::Vector3d(6.000,	0.000,	-2.121),
+//   Eigen::Vector3d(-3.000,	5.196,	-2.121),
+//   Eigen::Vector3d(-3.000,	-5.196,	-2.121),
+//   Eigen::Vector3d(0.000,	0.000,	6.000),
+//   Eigen::Vector3d(1.500,	2.598,	-2.121) + Eigen::Vector3d(0.00,	0.00,	2.0),
+//   Eigen::Vector3d(-3.000,	0.000,	-2.121),
+//   Eigen::Vector3d(1.500,	-2.598,	-2.121) + Eigen::Vector3d(0.00,	0.00,	2.0),
+//   Eigen::Vector3d(3.000,	0.000,	1.940),
+//   Eigen::Vector3d(-1.5,	2.598,	1.940),
+//   Eigen::Vector3d(-1.5,	-2.598,	1.940)
+// }, 
+//   Eigen::Vector3d(0, 0, 0), Eigen::Vector3d(1.0, 0.078, 0.576), DIFF)
+// };
 
 
 
@@ -392,6 +400,8 @@ Quadratic_tet({
 std::vector<Sphere> spheres;
 
 std::vector<Triangle> triangles;
+
+std::vector<Quadratic_tet> quadratic_tets;
 
 inline double clamp(double x){ return x<0 ? 0 : x>1 ? 1 : x; }
 
@@ -427,7 +437,8 @@ std::vector<Sphere> &spheres, std::vector<Triangle> triangles) {
     }
   }
 
-  for (int i=0; i<(int)sizeof(quadratic_tets)/sizeof(Quadratic_tet); i++) {
+  for (int i=0; i<(int)quadratic_tets.size(); i++) {
+    // std::cout << "HELLO";
     Eigen::Vector3d n_tmp;
     if ((d=quadratic_tets[i].intersect(r, n_tmp)) && d<t) {
        t=d; id=i; isTri=4; n=n_tmp;
@@ -436,6 +447,95 @@ std::vector<Sphere> &spheres, std::vector<Triangle> triangles) {
 
   return t<inf;
 }
+
+
+struct Mesh {
+    std::vector<Eigen::Vector3d> points;
+    std::vector<std::vector<int>> elements;
+    std::vector<std::vector<Eigen::Vector3d>> elem_coords;
+
+
+    void loadVolFile(const std::string& filename) {
+      // Mesh mesh;
+      std::ifstream file(filename);
+      
+      if (!file.is_open()) {
+          std::cerr << "Cannot open .vol file: " << filename << std::endl;
+      }
+  
+      std::string line;
+      while (std::getline(file, line)) {
+          // Load points
+          if (line.find("points") != std::string::npos) {
+            // std::cout << "yes1  ";
+              int numPoints;
+              file >> numPoints;
+              points.reserve(numPoints);
+              for (int i = 0; i < numPoints; ++i) {
+                  double x, y, z;
+                  file >> x >> y >> z;
+                  points.emplace_back(x, y, z);
+              }
+  
+              break;
+          }
+      }
+      file.close();
+  
+  
+      std::ifstream file1(filename);
+      std::string line1;
+      while (std::getline(file1, line1)) {
+          
+          // Load elements
+          if (line1.find("volumeelements") != std::string::npos) {
+            // std::cout << "yes2!   ";
+              int numElements;
+              file1 >> numElements;
+              elements.reserve(numElements);
+              for (int i = 0; i < numElements; ++i) {
+                  int mat, np;
+                  file1 >> mat >> np; // material number of points
+                  
+                  std::vector<int> elementNodes(np);
+                  for (int j = 0; j < np; ++j) {
+                      file1 >> elementNodes[j];
+                      // Convert 1-based indexing used in .vol to 0-based
+                      elementNodes[j]--; 
+                  }
+                  elements.push_back(elementNodes);
+
+                  // if (i == 1) break;
+              }
+          }
+      }
+      file1.close();
+    };
+
+    void getElementCoords() {
+
+      std::vector<int> element_node_numbers;
+
+      elem_coords.resize(elements.size()); // Number of rows
+      for(auto& row : elem_coords) {
+          row.resize(10, Eigen::Vector3d::Zero()); // Number of columns
+      }
+
+      for (int i = 0; i < elements.size(); ++i) {
+
+        element_node_numbers = elements[i];
+
+
+        for (int j = 0; j < 10; ++j) {
+
+          // elem_coords[i][j] = Eigen::Vector3d(0, 0, 1);
+          elem_coords[i][j] = points[element_node_numbers[j]];
+        }
+
+      }
+
+    };
+};
 
 
 bool loadOBJ(const std::string &filename, std::vector<Triangle> &tris) {
@@ -468,6 +568,7 @@ bool loadOBJ(const std::string &filename, std::vector<Triangle> &tris) {
   std::cerr << "Loaded " << tris.size() << " triangles from " << filename << "\n";
   return true;
 }
+
 
 Refl_t stringToRefl(const std::string &s) {
     if (s == "DIFF" || s == "diff" || s == "diffuse") return DIFF;
@@ -508,6 +609,22 @@ bool loadSpheres(const std::string &filename, std::vector<Sphere> &sph) {
   std::cerr << "Loaded " << sph.size() << " spheres from " << filename << "\n";
   return true;
 }
+
+bool loadVOL(const Mesh &mesh , std::vector<Quadratic_tet> &quadratic_tets) {
+  
+  std::vector<Eigen::Vector3d> nodes; 
+
+  for (int i = 0; i < mesh.elem_coords.size(); ++i) {
+
+    nodes = mesh.elem_coords[i];
+    quadratic_tets.emplace_back(nodes, Eigen::Vector3d(0, 0, 0), Eigen::Vector3d(1.0, 0.078, 0.576), DIFF);
+
+  }
+  
+  std::cerr << "Loaded " << quadratic_tets.size() << " quadratic tetrahedrons" << "\n";
+  return true;
+}
+
 
 
 
@@ -629,6 +746,26 @@ int main(int argc,char *argv[]){
 
   if(argc >= 2) loadOBJ(argv[1], triangles);
   if(argc >= 3) loadSpheres(argv[2], spheres);
+
+
+
+   Mesh mesh;
+   mesh.loadVolFile("sphere.vol");
+   mesh.getElementCoords();
+
+
+
+   std::cout << "Number of points: " << mesh.points.size() << std::endl;
+   std::cout << "Number of elements: " << mesh.elements.size() << std::endl;
+   std::cout << "Number of elements: " << mesh.elem_coords.size() << std::endl;
+
+   loadVOL(mesh , quadratic_tets);
+
+   std::cout << "Number of loaded elements: " << quadratic_tets.size() << std::endl;
+
+
+
+
 
   double fov = 20;  // Vertical view angle (field of view)
   auto theta = degrees_to_radians(fov);
