@@ -224,7 +224,11 @@ struct Quadratic_tet {
     }
 
     double intersect(const Ray &r, Eigen::Vector3d &n_out) const {
-      const double eps = 1e-8;  
+      const double eps = 1e-8;
+
+      double eps1 = 0.4;
+
+
       double min_t = 1e20;
       bool intersect = false;
 
@@ -243,10 +247,10 @@ struct Quadratic_tet {
             double invDet = 1.0 / det;
             Eigen::Vector3d tvec = r.o - v0;
             double u = tvec.dot(pvec) * invDet;
-            if (u < 0 || u > 1) continue;
+            if (u < 0 - eps1 || u > 1 + eps1) continue;
             Eigen::Vector3d qvec = tvec.cross(edge1);
             double v = r.d.dot(qvec) * invDet;
-            if (v < 0 || u + v > 1) continue;
+            if (v < 0 - eps1 || u + v > 1 + eps1) continue;
             double t_guess = edge2.dot(qvec) * invDet;
             if (t_guess < eps) continue;
 
@@ -254,14 +258,15 @@ struct Quadratic_tet {
             Eigen::Vector2d gh(0.33, 0.33); 
             double t = t_guess;
 
-            for (int iter = 0; iter < 8; ++iter) {
+            for (int iter = 0; iter < 500; ++iter) {
                 Eigen::VectorXd N = get_face_N(gh.x(), gh.y());
                 Eigen::Vector3d P = Eigen::Vector3d::Zero();
                 for(int i=0; i<6; ++i) P += N[i] * f_nodes[i];
 
                 Eigen::Vector3d res = r.o + t * r.d - P;
-                if (res.norm() < 1e-7) {
-                    if (gh.x() >= -0.0 && gh.y() >= -0.0 && (gh.x() + gh.y()) <= 1.0) {
+                if (res.norm() < 1e-15) {
+
+                    if (gh.x() >= -0.0001 && gh.y() >= -0.0001 && (gh.x() + gh.y()) <= 1.0001) {
                         if (t < min_t && t > 1e-4) {
                             min_t = t;
                             Eigen::Matrix<double, 3, 2> J = get_face_Jacobian(gh.x(), gh.y(), f_nodes);
