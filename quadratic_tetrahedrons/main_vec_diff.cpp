@@ -175,16 +175,6 @@ struct Quadric_element {
   }
 };
 
-
-
-struct FaceHessian {
-    Eigen::Vector3d d2N_dg2;
-    Eigen::Vector3d d2N_dh2;
-    Eigen::Vector3d d2N_dgh;
-};
-
-
-
 struct Quadratic_tet {
     std::vector<Eigen::Vector3d> nodes; 
     Eigen::Vector3d e, c;
@@ -231,29 +221,6 @@ struct Quadratic_tet {
             J.col(1) += f_nodes[i] * dNdv[i];
         }
         return J;
-    }
-
-    static FaceHessian get_face_Hessian(const std::vector<Eigen::Vector3d>& f_nodes) {
-        // Constant second derivatives of the 6 shape functions
-        // d2N/dg2
-        double ddN_dg2[6] = { 4.0, 4.0, 0.0, -8.0, 0.0, 0.0 };
-        // d2N/dh2
-        double ddN_dh2[6] = { 4.0, 0.0, 4.0, 0.0, 0.0, -8.0 };
-        // d2N/dgdh
-        double ddN_dgh[6] = { 4.0, 0.0, 0.0, -4.0, 4.0, -4.0 };
-    
-        FaceHessian H;
-        H.d2N_dg2.setZero();
-        H.d2N_dh2.setZero();
-        H.d2N_dgh.setZero();
-    
-        for (int i = 0; i < 6; ++i) {
-            H.d2N_dg2 += f_nodes[i] * ddN_dg2[i];
-            H.d2N_dh2 += f_nodes[i] * ddN_dh2[i];
-            H.d2N_dgh += f_nodes[i] * ddN_dgh[i];
-        }
-        
-        return H;
     }
 
     double intersect(const Ray &r, Eigen::Vector3d &n_out) const {
@@ -805,7 +772,7 @@ int main(int argc,char *argv[]){
 
 
    Mesh mesh;
-   mesh.loadVolFile("sphere.vol");
+   mesh.loadVolFile("sphere2.vol");
    mesh.getElementCoords();
 
 

@@ -1,4 +1,4 @@
-\begin{thebibliography}{31}
+\begin{thebibliography}{3}
 \expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
 \providecommand{\url}[1]{\texttt{#1}}
 \providecommand{\href}[2]{#2}
@@ -11,260 +11,28 @@
 \providecommand{\Pubmed}[1]{\href{pmid:#1}{\path{#1}}}
 \providecommand{\bibinfo}[2]{#2}
 \ifx\xfnm\relax \def\xfnm[#1]{\unskip,\space#1}\fi
-%Type = Article
-\bibitem[{Yao et~al.(2023)Yao, Yang, Wang, and Zhang}]{DT_review}
-\bibinfo{author}{J.-F. Yao}, \bibinfo{author}{Y.~Yang}, \bibinfo{author}{X.-C.
-  Wang}, \bibinfo{author}{X.-P. Zhang},
-\newblock \bibinfo{title}{Systematic review of digital twin technology and
-  applications},
-\newblock \bibinfo{journal}{Visual Computing for Industry, Biomedicine, and
-  Art} \bibinfo{volume}{6} (\bibinfo{year}{2023}) \bibinfo{pages}{10}.
-  \DOIprefix\doi{10.1186/s42492-023-00137-4}.
 %Type = Book
-\bibitem[{Tarantola(2004)}]{Inverse_problem_theory}
-\bibinfo{author}{A.~Tarantola}, \bibinfo{title}{Inverse Problem Theory and
-  Methods for Model Parameter Estimation}, \bibinfo{publisher}{Society for
-  Industrial and Applied Mathematics}, \bibinfo{year}{2004}.
+\bibitem[{Glassner(1989)}]{ray_tracing_intro}
+\bibinfo{author}{A.~Glassner}, \bibinfo{title}{An Introduction to Ray Tracing},
+  The Morgan Kaufmann Series in Computer Graphics, \bibinfo{publisher}{Morgan
+  Kaufmann}, \bibinfo{year}{1989}. \URLprefix
+  \url{https://books.google.co.uk/books?id=t3XNCgAAQBAJ}.
 %Type = Article
-\bibitem[{Arridge et~al.(2019)Arridge, Maass, Öktem, and
-  Schönlieb}]{Cambridge}
-\bibinfo{author}{S.~Arridge}, \bibinfo{author}{P.~Maass},
-  \bibinfo{author}{O.~Öktem}, \bibinfo{author}{C.-B. Schönlieb},
-\newblock \bibinfo{title}{Solving inverse problems using data-driven models},
-\newblock \bibinfo{journal}{Acta Numerica} \bibinfo{volume}{28}
-  (\bibinfo{year}{2019}) \bibinfo{pages}{1--174}.
-  \DOIprefix\doi{10.1017/S0962492919000059}.
+\bibitem[{Toth(1985)}]{ray_tracing_Toth}
+\bibinfo{author}{D.~L. Toth},
+\newblock \bibinfo{title}{On ray tracing parametric surfaces},
+\newblock \bibinfo{journal}{SIGGRAPH Comput. Graph.} \bibinfo{volume}{19}
+  (\bibinfo{year}{1985}) \bibinfo{pages}{171–179}. \URLprefix
+  \url{https://doi.org/10.1145/325165.325233}.
+  \DOIprefix\doi{10.1145/325165.325233}.
 %Type = Article
-\bibitem[{Bangian-Tabrizi and Jaluria(2018)}]{Jaluria}
-\bibinfo{author}{A.~Bangian-Tabrizi}, \bibinfo{author}{Y.~Jaluria},
-\newblock \bibinfo{title}{An optimization strategy for the inverse solution of
-  a convection heat transfer problem},
-\newblock \bibinfo{journal}{International Journal of Heat and Mass Transfer}
-  \bibinfo{volume}{124} (\bibinfo{year}{2018}) \bibinfo{pages}{1147 – 1155}.
-  \DOIprefix\doi{10.1016/j.ijheatmasstransfer.2018.04.053}.
-%Type = Article
-\bibitem[{Tamaddon-Jahromi et~al.(2020)Tamaddon-Jahromi, Chakshu, Sazonov,
-  Evans, Thomas, and Nithiarasu}]{Tamaddon_Jahromi}
-\bibinfo{author}{H.~R. Tamaddon-Jahromi}, \bibinfo{author}{N.~K. Chakshu},
-  \bibinfo{author}{I.~Sazonov}, \bibinfo{author}{L.~M. Evans},
-  \bibinfo{author}{H.~Thomas}, \bibinfo{author}{P.~Nithiarasu},
-\newblock \bibinfo{title}{Data-driven inverse modelling through neural network
-  (deep learning) and computational heat transfer},
-\newblock \bibinfo{journal}{Computer Methods in Applied Mechanics and
-  Engineering} \bibinfo{volume}{369} (\bibinfo{year}{2020})
-  \bibinfo{pages}{113217}.
-  \DOIprefix\doi{https://doi.org/10.1016/j.cma.2020.113217}.
-%Type = Article
-\bibitem[{Tercan and Meisen(2022)}]{ML_manufacturing}
-\bibinfo{author}{H.~Tercan}, \bibinfo{author}{T.~Meisen},
-\newblock \bibinfo{title}{Machine learning and deep learning based predictive
-  quality in manufacturing: a systematic review},
-\newblock \bibinfo{journal}{Journal of Intelligent Manufacturing}
-  \bibinfo{volume}{33} (\bibinfo{year}{2022}) \bibinfo{pages}{1879--1905}.
-  \DOIprefix\doi{10.1007/s10845-022-01963-8}.
-%Type = Article
-\bibitem[{{Le Clainche} et~al.(2023){Le Clainche}, Ferrer, Gibson, Cross,
-  Parente, and Vinuesa}]{ML_aerospace}
-\bibinfo{author}{S.~{Le Clainche}}, \bibinfo{author}{E.~Ferrer},
-  \bibinfo{author}{S.~Gibson}, \bibinfo{author}{E.~Cross},
-  \bibinfo{author}{A.~Parente}, \bibinfo{author}{R.~Vinuesa},
-\newblock \bibinfo{title}{Improving aircraft performance using machine
-  learning: A review},
-\newblock \bibinfo{journal}{Aerospace Science and Technology}
-  \bibinfo{volume}{138} (\bibinfo{year}{2023}) \bibinfo{pages}{108354}.
-  \DOIprefix\doi{https://doi.org/10.1016/j.ast.2023.108354}.
-%Type = Book
-\bibitem[{Goodfellow et~al.(2016)Goodfellow, Bengio, and Courville}]{DL}
-\bibinfo{author}{I.~Goodfellow}, \bibinfo{author}{Y.~Bengio},
-  \bibinfo{author}{A.~Courville}, \bibinfo{title}{Deep Learning},
-  \bibinfo{publisher}{The MIT Press}, \bibinfo{year}{2016}.
-%Type = Book
-\bibitem[{Rasmussen and Williams(2005)}]{GPR}
-\bibinfo{author}{C.~Rasmussen}, \bibinfo{author}{C.~Williams},
-  \bibinfo{title}{Gaussian Processes for Machine Learning}, Adaptive
-  Computation and Machine Learning series, \bibinfo{publisher}{MIT Press},
-  \bibinfo{year}{2005}.
-%Type = Book
-\bibitem[{Mehlig(2021)}]{NNs}
-\bibinfo{author}{B.~Mehlig}, \bibinfo{title}{Machine Learning with Neural
-  Networks: An Introduction for Scientists and Engineers},
-  \bibinfo{publisher}{Cambridge University Press}, \bibinfo{year}{2021}.
-  \DOIprefix\doi{10.1017/9781108860604}.
-%Type = Article
-\bibitem[{Yagawa and Okuda(1996)}]{ANNs}
-\bibinfo{author}{G.~Yagawa}, \bibinfo{author}{H.~Okuda},
-\newblock \bibinfo{title}{Neural networks in computational mechanics},
-\newblock \bibinfo{journal}{Archives of Computational Methods in Engineering}
-  \bibinfo{volume}{3} (\bibinfo{year}{1996}) \bibinfo{pages}{435 – 512}.
-  \DOIprefix\doi{10.1007/BF02818935}.
-%Type = Article
-\bibitem[{Bielajewa et~al.(2024)Bielajewa, Tindall, and
-  Nithiarasu}]{bielajewa2023}
-\bibinfo{author}{W.~Bielajewa}, \bibinfo{author}{M.~Tindall},
-  \bibinfo{author}{P.~Nithiarasu},
-\newblock \bibinfo{title}{Comparative study of transformer- and lstm-based
-  machine learning methods for transient thermal field reconstruction},
-\newblock \bibinfo{journal}{Computational Thermal Sciences: An International
-  Journal} \bibinfo{volume}{16} (\bibinfo{year}{2024}).
-  \DOIprefix\doi{10.1615/ComputThermalScien.2023049936}.
-%Type = Phdthesis
-\bibitem[{Lewis(2023)}]{GPR_thesis}
-\bibinfo{author}{R.~Lewis}, \bibinfo{title}{Simulation driven machine learning
-  methods to optimise design of physical experiments and enhance data analysis
-  for testing of fusion energy heat exchanger components}, \bibinfo{type}{Phd
-  thesis}, Swansea University, \bibinfo{year}{2023}.
-%Type = Article
-\bibitem[{Zhang et~al.(2023)Zhang, Gong, Zhou, Zhao, Zheng, and
-  Yao}]{ZHANG2023106354}
-\bibinfo{author}{Y.~Zhang}, \bibinfo{author}{Z.~Gong},
-  \bibinfo{author}{W.~Zhou}, \bibinfo{author}{X.~Zhao},
-  \bibinfo{author}{X.~Zheng}, \bibinfo{author}{W.~Yao},
-\newblock \bibinfo{title}{Multi-fidelity surrogate modeling for temperature
-  field prediction using deep convolution neural network},
-\newblock \bibinfo{journal}{Engineering Applications of Artificial
-  Intelligence} \bibinfo{volume}{123} (\bibinfo{year}{2023})
-  \bibinfo{pages}{106354}.
-  \DOIprefix\doi{https://doi.org/10.1016/j.engappai.2023.106354}.
-%Type = Article
-\bibitem[{Zhu et~al.(2023)Zhu, Chen, Ren, and Han}]{ZHU2023120697}
-\bibinfo{author}{F.~Zhu}, \bibinfo{author}{J.~Chen}, \bibinfo{author}{D.~Ren},
-  \bibinfo{author}{Y.~Han},
-\newblock \bibinfo{title}{Transient temperature fields of the tank vehicle with
-  various parameters using deep learning method},
-\newblock \bibinfo{journal}{Applied Thermal Engineering} \bibinfo{volume}{230}
-  (\bibinfo{year}{2023}) \bibinfo{pages}{120697}.
-  \DOIprefix\doi{https://doi.org/10.1016/j.applthermaleng.2023.120697}.
-%Type = Article
-\bibitem[{Di~Meglio et~al.(2024)Di~Meglio, Massarotti, and
-  Nithiarasu}]{dimeglio24}
-\bibinfo{author}{A.~Di~Meglio}, \bibinfo{author}{N.~Massarotti},
-  \bibinfo{author}{P.~Nithiarasu},
-\newblock \bibinfo{title}{A physics-driven and machine learning-based digital
-  twinning approach to transient thermal systems},
-\newblock \bibinfo{journal}{International Journal of Numerical Methods for Heat
-  \& Fluid Flow} \bibinfo{volume}{34} (\bibinfo{year}{2024})
-  \bibinfo{pages}{2229--2256}. \URLprefix
-  \url{https://doi.org/10.1108/HFF-10-2023-0616}.
-  \DOIprefix\doi{10.1108/HFF-10-2023-0616}.
-%Type = Article
-\bibitem[{Meglio et~al.(2025)Meglio, Massarotti, and Nithiarasu}]{DT_RL_Meglio}
-\bibinfo{author}{A.~D. Meglio}, \bibinfo{author}{N.~Massarotti},
-  \bibinfo{author}{P.~Nithiarasu},
-\newblock \bibinfo{title}{Digital twins of thermal systems: a comparison
-  between supervised and reinforcement learning},
-\newblock \bibinfo{journal}{Computational Thermal Sciences: An International
-  Journal} \bibinfo{volume}{17} (\bibinfo{year}{2025}) \bibinfo{pages}{39--46}.
-  \DOIprefix\doi{10.1615/ComputThermalScien.2025057435}.
-%Type = Article
-\bibitem[{Raissi et~al.(2019)Raissi, Perdikaris, and Karniadakis}]{PINNs}
-\bibinfo{author}{M.~Raissi}, \bibinfo{author}{P.~Perdikaris},
-  \bibinfo{author}{G.~E. Karniadakis},
-\newblock \bibinfo{title}{Physics-informed neural networks: A deep learning
-  framework for solving forward and inverse problems involving nonlinear
-  partial differential equations},
-\newblock \bibinfo{journal}{Journal of Computational Physics}
-  \bibinfo{volume}{378} (\bibinfo{year}{2019}) \bibinfo{pages}{686--707}.
-  \DOIprefix\doi{https://doi.org/10.1016/j.jcp.2018.10.045}.
-%Type = Article
-\bibitem[{Sharma et~al.(2023)Sharma, Evans, Tindall, and Nithiarasu}]{PINNs_P}
-\bibinfo{author}{P.~Sharma}, \bibinfo{author}{L.~Evans},
-  \bibinfo{author}{M.~Tindall}, \bibinfo{author}{P.~Nithiarasu},
-\newblock \bibinfo{title}{Stiff-pdes and physics-informed neural networks},
-\newblock \bibinfo{journal}{Archives of Computational Methods in Engineering}
-  \bibinfo{volume}{30} (\bibinfo{year}{2023}) \bibinfo{pages}{2929--2958}.
-  \DOIprefix\doi{10.1007/s11831-023-09890-4}.
-%Type = Article
-\bibitem[{Karnakov et~al.(2023)Karnakov, Litvinov, and Koumoutsakos}]{ODIL}
-\bibinfo{author}{P.~Karnakov}, \bibinfo{author}{S.~Litvinov},
-  \bibinfo{author}{P.~Koumoutsakos},
-\newblock \bibinfo{title}{Flow reconstruction by multiresolution optimization
-  of a discrete loss with automatic differentiation},
-\newblock \bibinfo{journal}{The European Physical Journal E}
-  \bibinfo{volume}{46} (\bibinfo{year}{2023}) \bibinfo{pages}{59}.
-  \DOIprefix\doi{10.1140/epje/s10189-023-00313-7}.
-%Type = Article
-\bibitem[{Karnakov et~al.(2024)Karnakov, Litvinov, and Koumoutsakos}]{ODIL1}
-\bibinfo{author}{P.~Karnakov}, \bibinfo{author}{S.~Litvinov},
-  \bibinfo{author}{P.~Koumoutsakos},
-\newblock \bibinfo{title}{Solving inverse problems in physics by optimizing a
-  discrete loss: Fast and accurate learning without neural networks},
-\newblock \bibinfo{journal}{PNAS Nexus} \bibinfo{volume}{3}
-  (\bibinfo{year}{2024}) \bibinfo{pages}{pgae005}.
-  \DOIprefix\doi{10.1093/pnasnexus/pgae005}.
-%Type = Phdthesis
-\bibitem[{Hancock(2018)}]{Hancock_thesis}
-\bibinfo{author}{D.~Hancock}, \bibinfo{title}{Employing Additive Manufacturing
-  for Fusion High Heat Flux Structures}, \bibinfo{type}{Phd thesis}, University
-  of Sheffield, \bibinfo{year}{2018}.
-%Type = Phdthesis
-\bibitem[{Lewis(2023)}]{Lewis_thesis}
-\bibinfo{author}{R.~Lewis}, \bibinfo{title}{Simulation driven machine learning
-  methods to optimise design of physical experiments and enhance data analysis
-  for testing of fusion energy heat exchanger components}, \bibinfo{type}{Phd
-  thesis}, Swansea University, \bibinfo{year}{2023}.
-%Type = Book
-\bibitem[{Bj{\"o}rck(1996)}]{GN1}
-\bibinfo{author}{{\AA}.~Bj{\"o}rck}, \bibinfo{title}{Numerical Methods for
-  Least Squares Problems}, \bibinfo{publisher}{Society for Industrial and
-  Applied Mathematics}, \bibinfo{year}{1996}.
-  \DOIprefix\doi{10.1137/1.9781611971484}.
-%Type = Article
-\bibitem[{Gratton et~al.(2007)Gratton, Lawless, and Nichols}]{GN2}
-\bibinfo{author}{S.~Gratton}, \bibinfo{author}{A.~S. Lawless},
-  \bibinfo{author}{N.~K. Nichols},
-\newblock \bibinfo{title}{Approximate gauss–newton methods for nonlinear
-  least squares problems},
-\newblock \bibinfo{journal}{SIAM Journal on Optimization} \bibinfo{volume}{18}
-  (\bibinfo{year}{2007}) \bibinfo{pages}{106--132}.
-  \DOIprefix\doi{10.1137/050624935}.
-%Type = Misc
-\bibitem[{{ANSYS, Inc.}(2023)}]{ansys}
-\bibinfo{author}{{ANSYS, Inc.}}, \bibinfo{title}{Ansys software},
-  \bibinfo{howpublished}{Available at \url{https://www.ansys.com/}},
-  \bibinfo{year}{2023}. \bibinfo{note}{[Software]}.
-%Type = Article
-\bibitem[{Gangl et~al.(2021)Gangl, Sturm, Neunteufel, and Schöberl}]{ngsolve}
-\bibinfo{author}{P.~Gangl}, \bibinfo{author}{K.~Sturm},
-  \bibinfo{author}{M.~Neunteufel}, \bibinfo{author}{J.~Schöberl},
-\newblock \bibinfo{title}{Fully and semi-automated shape differentiation in
-  ngsolve},
-\newblock \bibinfo{journal}{Structural \& Multidisciplinary Optimization}
-  \bibinfo{volume}{63} (\bibinfo{year}{2021}) \bibinfo{pages}{1579--1607}.
-  \DOIprefix\doi{https://doi.org/10.1007/s00158-020-02742-w}.
-%Type = Article
-\bibitem[{Marshall et~al.(2001)Marshall, Youchison, and
-  Cadwallader}]{1DCoolant}
-\bibinfo{author}{T.~D. Marshall}, \bibinfo{author}{D.~L. Youchison},
-  \bibinfo{author}{L.~C. Cadwallader},
-\newblock \bibinfo{title}{Modeling the nukiyama curve for water-cooled fusion
-  divertor channels},
-\newblock \bibinfo{journal}{Fusion Technol.} \bibinfo{volume}{35}
-  (\bibinfo{year}{2001}) \bibinfo{pages}{8--16}. \URLprefix
-  \url{http://film2000.free.fr/TOFE.pdf}.
-%Type = Article
-\bibitem[{Seibold et~al.(2022)Seibold, Ligrani, and
-  Weigand}]{Flow_and_heat_transfer_Seibold}
-\bibinfo{author}{F.~Seibold}, \bibinfo{author}{P.~Ligrani},
-  \bibinfo{author}{B.~Weigand},
-\newblock \bibinfo{title}{Flow and heat transfer in swirl tubes — a review},
-\newblock \bibinfo{journal}{International Journal of Heat and Mass Transfer}
-  \bibinfo{volume}{187} (\bibinfo{year}{2022}) \bibinfo{pages}{122455}.
-  \DOIprefix\doi{https://doi.org/10.1016/j.ijheatmasstransfer.2021.122455}.
-%Type = Article
-\bibitem[{Araki et~al.(1996)Araki, Ogawa, Kunugi, Satoh, and
-  Suzuki}]{Experiments_on_heat_transfer_Araki}
-\bibinfo{author}{M.~Araki}, \bibinfo{author}{M.~Ogawa},
-  \bibinfo{author}{T.~Kunugi}, \bibinfo{author}{K.~Satoh},
-  \bibinfo{author}{S.~Suzuki},
-\newblock \bibinfo{title}{Experiments on heat transfer of smooth and swirl
-  tubes under one-sided heating conditions},
-\newblock \bibinfo{journal}{International Journal of Heat and Mass Transfer}
-  \bibinfo{volume}{39} (\bibinfo{year}{1996}) \bibinfo{pages}{3045--3055}.
-  \DOIprefix\doi{https://doi.org/10.1016/0017-9310(95)00344-4}.
-%Type = Book
-\bibitem[{Park(1993)}]{temperature_uncertainty_Park}
-\bibinfo{editor}{R.~M. Park} (Ed.), \bibinfo{title}{Manual on the Use of
-  Thermocouples in Temperature Measurement}, \bibinfo{edition}{4th} ed.,
-  \bibinfo{publisher}{ASTM Committee E20}, \bibinfo{year}{1993}.
+\bibitem[{Joy and Bhetanabhotla(1986)}]{ray_tracing_Joy}
+\bibinfo{author}{K.~I. Joy}, \bibinfo{author}{M.~N. Bhetanabhotla},
+\newblock \bibinfo{title}{Ray tracing parametric surface patches utilizing
+  numerical techniques and ray coherence},
+\newblock \bibinfo{journal}{SIGGRAPH Comput. Graph.} \bibinfo{volume}{20}
+  (\bibinfo{year}{1986}) \bibinfo{pages}{279–285}. \URLprefix
+  \url{https://doi.org/10.1145/15886.15917}.
+  \DOIprefix\doi{10.1145/15886.15917}.
 
 \end{thebibliography}

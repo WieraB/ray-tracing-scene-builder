@@ -33,30 +33,40 @@
 
 \end{frontmatter}
 
-\section{Intersection problem}\label{intersect}
+\section{Tetrahedron and ray}
 
 Surface position on the tetrahedron's face (weighted sum of shape functions):
 \begin{align}
-	P(g,h) = \sum_{i-0}^{5} N_i(g,h) \cdot f_{nodes_i}
+	\bm{P}(g,h) = \sum_{i=0}^{5} N_i(g,h) \cdot \bm{f_{nodes_i}}
 \end{align}
 
 Ray:
 \begin{align}
-	R(t) = \bm{o} + t \bm{d}
+	\bm{R} (t) = \bm{o} + t \bm{d}
 \end{align}
-where $\bm{d}$ is the ray's direction, and $\bm{o}$ is the ray's origin
+where $\bm{d}$ is the ray's direction, and $\bm{o}$ is the ray's origin.
 
-Face-ray intersection (3 unknowns):
+\section{Intersection by minimising vector difference}
+
+\subsection{Intersection problem}\label{intersect}
+
+Face-ray intersection (3 unknowns) presented as the vector difference \cite{ray_tracing_intro, ray_tracing_Toth}:
 \begin{align}
 	\bm{o} + t \bm{d} - P(g,h) = 0
 \end{align}
 
 Nonlinear system of equations:
 \begin{align}
-	F(t,g,h) = \bm{o} + t \bm{d} - \sum_{i-0}^{5} N_i(g,h) \cdot f_{nodes_i} = \bm{0}
+	\bm{F} (t,g,h) = \bm{o} + t \bm{d} - \sum_{i-0}^{5} N_i(g,h) \cdot f_{nodes_i} = \bm{0}
 \end{align}
 
-\section{Möller-Trumbore algorithm for linear triangle intersection (initial guess)}\label{MT}
+The system of equations contains 3 unknowns and 3 equations, so the mapping is:
+\begin{align}
+	\Re^3 \rightarrow \Re^3
+\end{align}
+They represent the distance vector between a point on the ray and a point on the surface.
+
+\subsection{Möller-Trumbore algorithm for linear triangle intersection (initial guess)}\label{MT}
 
 \begin{align}
 	\bm{E_1} = V_1 - V_0, \; \bm{E_2} = V_2 - V_0 \\
@@ -83,7 +93,7 @@ Where $V_0$, $V_1$, $V_2$ are triangle vertices.
 \end{align}
 
 
-\section{Newton-Raphson}\label{NR}
+\subsection{Newton-Raphson method}\label{NR}
 
 Jacobian of $F$:
 \begin{align}
@@ -92,8 +102,8 @@ Jacobian of $F$:
 \end{align}
 
 \begin{align}
-	\frac{\partial P}{\partial g} = \sum_{i-0}^{5} \frac{\partial N_i}{\partial g} \cdot f_{nodes_i} \\
-	\frac{\partial P}{\partial h} = \sum_{i-0}^{5} \frac{\partial N_i}{\partial h} \cdot f_{nodes_i}
+	\frac{\partial \bm{P}}{\partial g} = \sum_{i=0}^{5} \frac{\partial N_i}{\partial g} \cdot \bm{f_{nodes_i}} \\
+	\frac{\partial \bm{P}}{\partial h} = \sum_{i=0}^{5} \frac{\partial N_i}{\partial h} \cdot \bm{f_{nodes_i}}
 \end{align}
 
 The update by solving a linear system:
@@ -116,12 +126,109 @@ The update by solving a linear system:
 \end{align}
 
 
+\section{Intersection by minimising scalar squared distance}
+
+\subsection{Intersection problem}\label{intersect1}
+
+Face-ray intersection could be presented as the scalar squared difference \cite{ray_tracing_Joy}:
+\begin{align}
+	 F(g,h) = \left| \bm{V} \right|^2 - \left( \bm{V} \cdot \bm{d} \right)^2
+\end{align}
+where
+\begin{align}
+	\bm{V} = \bm{P} (g,h) - \bm{o}
+\end{align}
+and
+\begin{align}
+	t =  \bm{V} \cdot \bm{d} = \left( \bm{P} (g,h) - \bm{o} \right) \cdot \bm{d}
+\end{align}
+
+The equation contains 2 unknowns, so the mapping is:
+\begin{align}
+	\Re^2 \rightarrow \Re^1
+\end{align}
+They represent the squared perpendicular distance between the ray and surface (Figure~\ref{ray-surface_distance}).
+
+\begin{figure}[!ht]
+	\centering
+	\includegraphics[width=0.4\textwidth]{figures/ray-surface_distance.png}
+	\caption{Distance from a point on the surface to a ray.}\label{ray-surface_distance}
+\end{figure}
+
+If a local minimum of $F$ is zero, then this corresponds to a point where the ray intersects the surface. Those points where $F$ is a minimum, but where $F > 0$, indicate that the ray misses the surface by a finite distance. This is actually desirable in that the algorithm will still converge near "silhouette edges" of surface, but will give a non-zero minimum.
+
+$F$ could be split into 2 functions:
+\begin{align}
+	\bm{F} (g,h) = \left| \bm{V} \right|^2 - \left( \bm{V} \cdot \bm{d} \right)^2
+\end{align}
+
+\subsection{Quasi-Newton method}\label{NR1}
+
+Jacobian of $F$:
+\begin{align}
+	\bm{J_F} = \left[ \frac{\partial F}{\partial g}, \frac{\partial F}{\partial h} \right]^T
+\end{align}
+
+The partials of $F$ are:
+\begin{align}
+	\frac{\partial F}{\partial g} (g,h) = 2 \left( \frac{\partial \bm{P}}{\partial g} \cdot \bm{V} - t \frac{\partial \bm{P}}{\partial g} \cdot \bm{d} \right) = \\
+	= 2  \frac{\partial \bm{P}}{\partial g}  \left( \bm{V} - t \bm{d} \right) = \\
+	= 2  \frac{\partial \bm{P}}{\partial g}  \left( \bm{P} - \left( \bm{o} + t \bm{d} \right) \right)
+\end{align}
+\begin{align}
+	\frac{\partial F}{\partial h} (g,h) = 2  \frac{\partial \bm{P}}{\partial h}  \left( \bm{P} - \left( \bm{o} + t \bm{d} \right) \right)
+\end{align} 
+
+
+
+Hessian of $F$:
+\begin{align}
+	\bm{H_F} = 
+	\begin{bmatrix}
+        \frac{\partial^2 F}{\partial g^2} & \frac{\partial^2 F}{\partial gh} \\
+		 \frac{\partial^2 F}{\partial hg} & \frac{\partial^2 F}{\partial h^2}
+	\end{bmatrix}  
+\end{align}
+where
+\begin{align}
+	\frac{\partial F}{\partial g^2} (g,h) = 2  \frac{\partial^2 \bm{P}}{\partial g^2}  \left( \bm{P} + 1 - \bm{R} \right)
+\end{align}
+\begin{align}
+	\frac{\partial F}{\partial h^2} (g,h) = 2  \frac{\partial^2 \bm{P}}{\partial h^2}  \left( \bm{P} + 1 - \bm{R} \right)
+\end{align}
+\begin{align}
+	\frac{\partial F}{\partial gh} (g,h) = \frac{\partial F}{\partial hg} (g,h) = 2  \frac{\partial^2 \bm{P}}{\partial gh}  \left( \bm{P} + 1 - \bm{R} \right)
+\end{align}
+
+
+The update by solving a linear system:
+\begin{align}
+	\bm{\Delta} = \left[ \Delta g, \Delta h \right]^T \\
+	\bm{H_F} \cdot \bm{\Delta} = - \bm{J_F}
+\end{align}
+
+\begin{align}
+	\begin{bmatrix}
+	\frac{\partial^2 F}{\partial g^2} & \frac{\partial^2 F}{\partial gh} \\
+	\frac{\partial^2 F}{\partial hg} & \frac{\partial^2 F}{\partial h^2}
+\end{bmatrix}  
+	\begin{bmatrix}
+		\Delta g \\
+		\Delta h
+	\end{bmatrix} = - \left[ \frac{\partial F}{\partial g}, \frac{\partial F}{\partial h} \right]^T
+\end{align}
+
+
+
 \section{Surface normal}\label{SN}
 
 \begin{align}
-	\bm{n} = \frac{\partial P}{\partial g} \times \frac{\partial P}{\partial h}
+	\bm{n} = \frac{\partial \bm{P}}{\partial g} \times \frac{\partial \bm{P}}{\partial h}
 \end{align}
 
+
+\bibliographystyle{num-names}
+\bibliography{bibliography}
 
 \end{document}
 

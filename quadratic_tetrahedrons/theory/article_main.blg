@@ -3,54 +3,45 @@ Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: article_main.aux
 The style file: num-names.bst
 Database file #1: bibliography.bib
-Repeated entry---line 500 of file bibliography.bib
- : @book{GN1
- :          ,
-I'm skipping whatever remains of this entry
-Repeated entry---line 508 of file bibliography.bib
- : @article{GN2
- :             ,
-I'm skipping whatever remains of this entry
 Reallocated singl_function (elt_size=4) to 100 items from 50.
-You've used 31 entries,
+You've used 3 entries,
             2918 wiz_defined-function locations,
-            855 strings with 11584 characters,
-and the built_in function-call counts, 19483 in all, are:
-= -- 1411
-> -- 798
-< -- 12
-+ -- 302
-- -- 267
-* -- 2326
-:= -- 2820
-add.period$ -- 56
-call.type$ -- 31
-change.case$ -- 242
-chr.to.int$ -- 31
-cite$ -- 31
-duplicate$ -- 1450
-empty$ -- 1445
-format.name$ -- 352
-if$ -- 3603
+            651 strings with 5701 characters,
+and the built_in function-call counts, 1730 in all, are:
+= -- 138
+> -- 39
+< -- 3
++ -- 17
+- -- 12
+* -- 187
+:= -- 255
+add.period$ -- 8
+call.type$ -- 3
+change.case$ -- 18
+chr.to.int$ -- 3
+cite$ -- 3
+duplicate$ -- 128
+empty$ -- 144
+format.name$ -- 19
+if$ -- 327
 int.to.chr$ -- 1
 int.to.str$ -- 1
-missing$ -- 293
-newline$ -- 150
-num.names$ -- 125
-pop$ -- 499
+missing$ -- 24
+newline$ -- 28
+num.names$ -- 12
+pop$ -- 35
 preamble$ -- 1
-purify$ -- 244
+purify$ -- 19
 quote$ -- 0
-skip$ -- 334
+skip$ -- 37
 stack$ -- 0
-substring$ -- 800
-swap$ -- 1055
+substring$ -- 92
+swap$ -- 84
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 261
+type$ -- 24
 warning$ -- 0
-while$ -- 115
+while$ -- 11
 width$ -- 0
-write$ -- 427
-(There were 2 error messages)
+write$ -- 57
