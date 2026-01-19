@@ -182,20 +182,20 @@ struct Quadratic_tet {
 
     // Nodes for the 4 faces - each face has 6 nodes: 3 corners, 3 mid-edges
     // Numbering for 1 tetrahedron example
-    // const int face_indices[4][6] = {
-    //     {0, 2, 1, 6, 5, 4}, // Face 0 (bottom)
-    //     {0, 1, 3, 4, 8, 7}, // Face 1
-    //     {1, 2, 3, 5, 9, 8}, // Face 2
-    //     {2, 0, 3, 6, 7, 9}  // Face 3
-    // };
+    const int face_indices[4][6] = {
+        {0, 2, 1, 6, 5, 4}, // Face 0 (bottom)
+        {0, 1, 3, 4, 8, 7}, // Face 1
+        {1, 2, 3, 5, 9, 8}, // Face 2
+        {2, 0, 3, 6, 7, 9}  // Face 3
+    };
 
       // Correct numbering for NGSolve/Netgen
-      const int face_indices[4][6] = {
-      {0, 1, 2, 4, 7, 5}, // Face 0 (bottom) (v0, v1, v2)
-      {0, 1, 3, 4, 8, 6}, // Face 1 (v0, v1, v3)
-      {1, 2, 3, 7, 9, 8}, // Face 2 (v1, v2, v3)
-      {0, 2, 3, 5, 9, 6}  // Face 3 (v0, v2, v3)
-      };
+      // const int face_indices[4][6] = {
+      // {0, 1, 2, 4, 7, 5}, // Face 0 (bottom) (v0, v1, v2)
+      // {0, 1, 3, 4, 8, 6}, // Face 1 (v0, v1, v3)
+      // {1, 2, 3, 7, 9, 8}, // Face 2 (v1, v2, v3)
+      // {0, 2, 3, 5, 9, 6}  // Face 3 (v0, v2, v3)
+      // };
 
     Quadratic_tet(std::vector<Eigen::Vector3d> nodes_, Eigen::Vector3d e_, Eigen::Vector3d c_, Refl_t refl_) :
         nodes(nodes_), e(e_), c(c_), refl(refl_) {}
@@ -772,7 +772,7 @@ int main(int argc,char *argv[]){
 
 
    Mesh mesh;
-   mesh.loadVolFile("sphere2.vol");
+   mesh.loadVolFile("one_tet.vol");
    mesh.getElementCoords();
 
 

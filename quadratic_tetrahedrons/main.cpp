@@ -2,6 +2,8 @@
 #include <stdlib.h> // Make : g++ -O3 -fopenmp smallpt.cpp -o smallpt
 #include <stdio.h> 
 #include "../Eigen/Dense"
+// #include "../Eigen/Eigenvalues" 
+#include "dlib/optimization.h"
 #include <vector>
 #include <string>
 #include <fstream>
@@ -175,16 +177,6 @@ struct Quadric_element {
   }
 };
 
-
-
-struct FaceHessian {
-    Eigen::Vector3d d2N_dg2;
-    Eigen::Vector3d d2N_dh2;
-    Eigen::Vector3d d2N_dgh;
-};
-
-
-
 struct Quadratic_tet {
     std::vector<Eigen::Vector3d> nodes; 
     Eigen::Vector3d e, c;
@@ -233,7 +225,7 @@ struct Quadratic_tet {
         return J;
     }
 
-    static FaceHessian get_face_Hessian(const std::vector<Eigen::Vector3d>& f_nodes) {
+    static Eigen::Matrix<double, 3, 3> get_face_Hessian(const std::vector<Eigen::Vector3d>& f_nodes) {
         // Constant second derivatives of the 6 shape functions
         // d2N/dg2
         double ddN_dg2[6] = { 4.0, 4.0, 0.0, -8.0, 0.0, 0.0 };
@@ -242,18 +234,163 @@ struct Quadratic_tet {
         // d2N/dgdh
         double ddN_dgh[6] = { 4.0, 0.0, 0.0, -4.0, 4.0, -4.0 };
     
-        FaceHessian H;
-        H.d2N_dg2.setZero();
-        H.d2N_dh2.setZero();
-        H.d2N_dgh.setZero();
+        Eigen::Matrix<double, 3, 3> H = Eigen::Matrix<double, 3, 3>::Zero();
+        Eigen::Vector3d d2N_dg2 = Eigen::Vector3d::Zero();
+        Eigen::Vector3d d2N_dh2 = Eigen::Vector3d::Zero();
+        Eigen::Vector3d d2N_dgh = Eigen::Vector3d::Zero();
     
         for (int i = 0; i < 6; ++i) {
-            H.d2N_dg2 += f_nodes[i] * ddN_dg2[i];
-            H.d2N_dh2 += f_nodes[i] * ddN_dh2[i];
-            H.d2N_dgh += f_nodes[i] * ddN_dgh[i];
+            d2N_dg2 += f_nodes[i] * ddN_dg2[i];
+            d2N_dh2 += f_nodes[i] * ddN_dh2[i];
+            d2N_dgh += f_nodes[i] * ddN_dgh[i];
         }
+
+        H.col(0) = d2N_dg2; // d2N/dg2
+        H.col(1) = d2N_dh2; // d2N/dh2
+        H.col(2) = d2N_dgh; // d2N/dgdh
         
         return H;
+    }
+
+
+    static Eigen::Vector2d get_eq_Jacobian(double g, double h, const std::vector<Eigen::Vector3d>& f_nodes,
+      const Ray &ray) {
+        
+        // Calculate the position on the surface P
+        Eigen::VectorXd N = get_face_N(g, h);
+        Eigen::Vector3d P = Eigen::Vector3d::Zero();
+        for(int i=0; i<6; ++i) P += N[i] * f_nodes[i];
+
+        // Calculate Jacobians of the tet face shape functions
+        Eigen::Matrix<double, 3, 2> J = get_face_Jacobian(g, h, f_nodes);
+
+        // Calculate V and t
+        Eigen::Vector3d V = P - ray.o;
+        double t = V.dot(ray.d);
+
+        // Derivatives of F wrt g and h
+        double dFdg = 2 * J.col(0).dot(V - t * ray.d);
+        double dFdh = 2 * J.col(1).dot(V - t * ray.d);
+
+        Eigen::Vector2d J_F(dFdg, dFdh);
+
+        return J_F;
+    }
+
+
+    static Eigen::Matrix<double, 2, 2> get_eq_Hessian(double g, double h, const std::vector<Eigen::Vector3d>& f_nodes,
+      const Ray &ray) {
+        
+        // Calculate the position on the surface P
+        Eigen::VectorXd N = get_face_N(g, h);
+        Eigen::Vector3d P = Eigen::Vector3d::Zero();
+        for(int i=0; i<6; ++i) P += N[i] * f_nodes[i];
+
+        // Calculate Jacobians of the tet face shape functions
+        Eigen::Matrix<double, 3, 2> J = get_face_Jacobian(g, h, f_nodes);
+
+        // Calculate Jacobians of the tet face shape functions
+        Eigen::Matrix<double, 3, 3> H = get_face_Hessian(f_nodes);
+
+        // Calculate V and t
+        Eigen::Vector3d V = P - ray.o;
+        double t = V.dot(ray.d);
+        Eigen::Vector3d R = ray.o + t * ray.d;
+
+        Eigen::Vector3d unity = Eigen::Vector3d::Ones();
+
+        // Derivatives of F wrt g and h
+        // double ddF_dg2 = 2 * H.col(0).dot(P + unity - R);
+        // double ddF_dh2 = 2 * H.col(1).dot(P + unity - R);
+        // double ddF_dgh = 2 * H.col(2).dot(P + unity - R);
+
+        // double ddF_dg2 = 2 * H.col(0).dot(V + unity) * (1 - ray.d.dot(ray.d));
+        // double ddF_dh2 = 2 * H.col(1).dot(V + unity) * (1 - ray.d.dot(ray.d));
+        // double ddF_dgh = 2 * H.col(2).dot(V + unity) * (1 - ray.d.dot(ray.d));
+
+        // double ddF_dg2 = 2 * (H.col(0).dot(V) + J.col(0).dot(J.col(0)))
+        //                - 2 * ray.d.dot(ray.d) * (H.col(0).dot(V) + J.col(0).dot(J.col(0)));
+
+        // double ddF_dh2 = 2 * (H.col(1).dot(V) + J.col(1).dot(J.col(1)))
+        //                - 2 * ray.d.dot(ray.d) * (H.col(1).dot(V) + J.col(1).dot(J.col(1)));
+
+        // double ddF_dgh = 2 * (H.col(2).dot(V) + J.col(0).dot(J.col(1)))
+        //                - 2 * ray.d.dot(ray.d) * (H.col(2).dot(V) + J.col(0).dot(J.col(1)));
+
+
+        double ddF_dg2 = 2 * (J.col(0).dot(J.col(0)) - (J.col(0).dot(ray.d)) * (J.col(0).dot(ray.d)) 
+                            + V.dot(H.col(0)) - V.dot(ray.d) * H.col(0).dot(ray.d));
+
+        double ddF_dh2 = 2 * (J.col(1).dot(J.col(1)) - (J.col(1).dot(ray.d)) * (J.col(1).dot(ray.d)) 
+                            + V.dot(H.col(1)) - V.dot(ray.d) * H.col(1).dot(ray.d));
+
+        double ddF_dgh = 2 * (J.col(0).dot(J.col(1)) - (J.col(0).dot(ray.d)) * (J.col(1).dot(ray.d)) 
+                            + V.dot(H.col(2)) - V.dot(ray.d) * H.col(2).dot(ray.d));
+
+        Eigen::Matrix<double, 2, 2> H_F 
+        {
+          {ddF_dg2, ddF_dgh},
+          {ddF_dgh, ddF_dh2},
+        };
+
+        return H_F;
+    }
+
+
+    double backtracking_line_search(Eigen::Vector2d dir, Eigen::Vector2d x_init, Eigen::Vector2d J_F,
+      const std::vector<Eigen::Vector3d>& f_nodes, const Ray &r) const {
+
+      double s = 1.0;          // Initial step size
+      // double beta = 0.5;       // Contraction factor (0 < beta < 1)
+      // double c = 1e-4;         // Armijo condition constant
+      // int max_iter = 100;
+
+      double beta = 0.5;       // Contraction factor (0 < beta < 1)
+      double c = 1e-4;         // Armijo condition constant
+      int max_iter = 1000;
+
+      Eigen::VectorXd N = get_face_N(x_init.x(), x_init.y());
+      Eigen::Vector3d P = Eigen::Vector3d::Zero();
+      for(int i=0; i<6; ++i) P += N[i] * f_nodes[i];
+      Eigen::Vector3d V = P - r.o;
+      double dotProduct = V.dot(r.d);
+      double fx = V.squaredNorm() - (dotProduct * dotProduct);
+
+
+
+      double gradient_dir = J_F.dot(dir); // Directional derivative
+
+      //If the direction isn't a descent direction, line search will fail
+      if (gradient_dir > 0) return 0.0;
+
+
+      Eigen::Vector2d x = x_init;
+      for (int i = 0; i < max_iter; ++i) {
+        Eigen::Vector2d x_next = x + s * dir;
+
+        N = get_face_N(x_next.x(), x_next.y());
+        P = Eigen::Vector3d::Zero();
+        for(int i=0; i<6; ++i) P += N[i] * f_nodes[i];
+        V = P - r.o;
+        dotProduct = V.dot(r.d);
+        double f_next = V.squaredNorm() - (dotProduct * dotProduct);
+
+        // Armijo Condition: F(x + s*p) <= F(x) + c * s * (grad_F^T * p)
+        if (f_next <= fx + c * s * gradient_dir) {
+            break; // Success: sufficient decrease found
+        }
+
+        s *= beta; // Shrink the step size
+
+        if (s < 1e-12) break; // Step size too small
+    }
+
+    x = x + s * dir;
+    // std::cout << "Optimal scalar s: " << s << std::endl;
+    // std::cout << "New x: \n" << (x).transpose() << std::endl;
+
+    return s;
+
     }
 
     double intersect(const Ray &r, Eigen::Vector3d &n_out) const {
@@ -267,13 +404,14 @@ struct Quadratic_tet {
 
       const double eps_t = 1e-8; // Imprecision for t
 
-      const int iter_max = 500; // Maximum number of iterations for Newton-Raphson method.
+      const int iter_max = 1500; // Maximum number of iterations for Newton-Raphson method.
 
       // Define imprecision parameters for the solution.
       // Imprecision levels should be relatively small for solution.
-      const double eps_sol1 = 1e-15; // Imprecision for the residual
+      const double eps_sol1 = 1; // Imprecision for distance
       const double eps_sol2 = 1e-8; // Imprecision for the quadratic triangle's isoparametric coordinates (g, h)
       const double eps_sol3 = 1e-10; // Imprecision for the determinant
+      const double eps_sol4 = 0.1; // Convergence criteria, max allowed relative difference
 
 
       double min_t = 1e20;
@@ -307,15 +445,27 @@ struct Quadratic_tet {
             // Eigen::Vector2d gh(0.33, 0.33); 
             Eigen::Vector2d gh(u, v); 
             double t = t_guess;
+            Eigen::Matrix<double, 2, 2> M = get_eq_Hessian(gh.x(), gh.y(), f_nodes, r);
+
+            double res = 1e20;
+            double res_prev = 1e20;
 
             for (int iter = 0; iter < iter_max; ++iter) {
                 Eigen::VectorXd N = get_face_N(gh.x(), gh.y());
                 Eigen::Vector3d P = Eigen::Vector3d::Zero();
                 for(int i=0; i<6; ++i) P += N[i] * f_nodes[i];
 
-                Eigen::Vector3d res = r.o + t * r.d - P;
-                if (res.norm() < eps_sol1) {
+                Eigen::Vector3d V = P - r.o;
+                t = V.dot(r.d);
+                res_prev = res;
+                res = V.squaredNorm() - (t * t);
+                double diff = abs(res-res_prev) / abs(res);
 
+                if ( diff < eps_sol4) {
+
+                    if (res >= eps_sol1) break;
+                    // std::cout << diff << "    ";
+                  
                     if (gh.x() >= 0 - eps_sol2 && gh.y() >= 0 - eps_sol2 && (gh.x() + gh.y()) <= 1 + eps_sol2) {
                         if (t < min_t && t > eps_t) {
                             min_t = t;
@@ -327,18 +477,17 @@ struct Quadratic_tet {
                     break;
                 }
 
-                // Solve [rd, -dP/du, -dP/dv] * [dt, du, dv]^T = -res
-                Eigen::Matrix<double, 3, 2> J = get_face_Jacobian(gh.x(), gh.y(), f_nodes);
-                Eigen::Matrix3d M;
-                M.col(0) = r.d;
-                M.col(1) = -J.col(0);
-                M.col(2) = -J.col(1);
+                // Solve H_F * [dg, dh]^T = -J_F
+                M = get_eq_Hessian(gh.x(), gh.y(), f_nodes, r);
+                Eigen::Vector2d J_F = get_eq_Jacobian(gh.x(), gh.y(), f_nodes, r);
+                Eigen::Vector2d dir = M.inverse() * (-J_F);
+
+                double s = backtracking_line_search(dir, gh, J_F, f_nodes, r);
 
                 if (std::abs(M.determinant()) < eps_sol3) break;
-                Eigen::Vector3d delta = M.inverse() * (-res);
-                t += delta.x();
-                gh.x() += delta.y();
-                gh.y() += delta.z();
+                Eigen::Vector2d delta = s * M.inverse() * (-J_F);
+                gh.x() += delta.x();
+                gh.y() += delta.y();
             }
         }
 

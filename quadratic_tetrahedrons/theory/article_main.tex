@@ -52,12 +52,12 @@ where $\bm{d}$ is the ray's direction, and $\bm{o}$ is the ray's origin.
 
 Face-ray intersection (3 unknowns) presented as the vector difference \cite{ray_tracing_intro, ray_tracing_Toth}:
 \begin{align}
-	\bm{o} + t \bm{d} - P(g,h) = 0
+	\bm{o} + t \bm{d} - \bm{P}(g,h) = 0
 \end{align}
 
 Nonlinear system of equations:
 \begin{align}
-	\bm{F} (t,g,h) = \bm{o} + t \bm{d} - \sum_{i-0}^{5} N_i(g,h) \cdot f_{nodes_i} = \bm{0}
+	\bm{F} (t,g,h) = \bm{o} + t \bm{d} - \sum_{i-0}^{5} N_i(g,h) \cdot \bm{f_{nodes_i}} = \bm{0}
 \end{align}
 
 The system of equations contains 3 unknowns and 3 equations, so the mapping is:
@@ -95,10 +95,12 @@ Where $V_0$, $V_1$, $V_2$ are triangle vertices.
 
 \subsection{Newton-Raphson method}\label{NR}
 
+Since there are 3 variables and 3 equations, Newton-Raphson method could be used to find the solution. Only Jacobians of $F$ are required.
+
 Jacobian of $F$:
 \begin{align}
-	\bm{J_F} = \left[  \frac{\partial F}{\partial f}, \frac{\partial F}{\partial g}, \frac{\partial F}{\partial h} \right] \\
-	\bm{J_F} = \left[  \bm{d}, -\frac{\partial P}{\partial g}, -\frac{\partial P}{\partial h} \right]
+	\bm{J_F} = \left[  \frac{\partial \bm{F}}{\partial f}, \frac{\partial \bm{F}}{\partial g}, \frac{\partial \bm{F}}{\partial h} \right] \\
+	\bm{J_F} = \left[  \bm{d}, -\frac{\partial \bm{P}}{\partial g}, -\frac{\partial \bm{P}}{\partial h} \right]
 \end{align}
 
 \begin{align}
@@ -109,20 +111,20 @@ Jacobian of $F$:
 The update by solving a linear system:
 \begin{align}
 	\bm{\Delta} = \left[ \Delta t, \Delta g, \Delta h \right]^T \\
-	\bm{J_F} \cdot \bm{\Delta} = -F(t, g, h)
+	\bm{J_F} \cdot \bm{\Delta} = -\bm{F}(t, g, h)
 \end{align}
 
 \begin{align}
 \begin{bmatrix}
-	\bm{d}_x & -\frac{\partial P_x}{\partial g} & -\frac{\partial P_x}{\partial h} \\
-	\bm{d}_y & -\frac{\partial P_y}{\partial g} & -\frac{\partial P_y}{\partial h} \\
-	\bm{d}_z & -\frac{\partial P_z}{\partial g} & -\frac{\partial P_z}{\partial h} 
+	d_x & -\frac{\partial P_x}{\partial g} & -\frac{\partial P_x}{\partial h} \\
+	d_y & -\frac{\partial P_y}{\partial g} & -\frac{\partial P_y}{\partial h} \\
+	d_z & -\frac{\partial P_z}{\partial g} & -\frac{\partial P_z}{\partial h} 
 \end{bmatrix} 
 \begin{bmatrix}
 	\Delta t \\
 	\Delta g \\
 	\Delta h
-\end{bmatrix} = - (\bm{o} + t \bm{d} - P(g,h))
+\end{bmatrix} = - (\bm{o} + t \bm{d} - \bm{P}(g,h))
 \end{align}
 
 
@@ -152,22 +154,29 @@ They represent the squared perpendicular distance between the ray and surface (F
 \begin{figure}[!ht]
 	\centering
 	\includegraphics[width=0.4\textwidth]{figures/ray-surface_distance.png}
-	\caption{Distance from a point on the surface to a ray.}\label{ray-surface_distance}
+	\caption{Distance from a point on the surface to a ray \cite{ray_tracing_Joy}, $S$ is $P$ in this document.}\label{ray-surface_distance}
 \end{figure}
 
 If a local minimum of $F$ is zero, then this corresponds to a point where the ray intersects the surface. Those points where $F$ is a minimum, but where $F > 0$, indicate that the ray misses the surface by a finite distance. This is actually desirable in that the algorithm will still converge near "silhouette edges" of surface, but will give a non-zero minimum.
 
-$F$ could be split into 2 functions:
-\begin{align}
-	\bm{F} (g,h) = \left| \bm{V} \right|^2 - \left( \bm{V} \cdot \bm{d} \right)^2
-\end{align}
-
 \subsection{Quasi-Newton method}\label{NR1}
+
+It is not possible to use Newton-Raphson method in this case, as there are 3 variables and 1 equation. Additionally, this equation cannot be represented as a sum of squared residuals to be solved by Gauss-Newton approach. Consequently, it is necessary to know Jacobians as well as Hessians of $F$.
 
 Jacobian of $F$:
 \begin{align}
 	\bm{J_F} = \left[ \frac{\partial F}{\partial g}, \frac{\partial F}{\partial h} \right]^T
 \end{align}
+
+Let:
+\begin{align}
+	\bm{P}_g =  \frac{\partial \bm{P}}{\partial g} \\
+	\bm{P}_h =  \frac{\partial \bm{P}}{\partial h} \\
+	\bm{P}_{gg} =  \frac{\partial^2 \bm{P}}{\partial g^2} \\
+	\bm{P}_{hh} =  \frac{\partial^2 \bm{P}}{\partial h^2} \\
+	\bm{P}_{gh} = \bm{P}_{hg} = \frac{\partial^2 \bm{P}}{\partial gh} = \frac{\partial^2 \bm{P}}{\partial hg}
+\end{align}
+
 
 The partials of $F$ are:
 \begin{align}
@@ -180,6 +189,12 @@ The partials of $F$ are:
 \end{align} 
 
 
+\begin{align}
+	\frac{\partial F}{\partial g} (g,h) = 2  \bm{P}_g \left( \bm{V} - t \bm{d} \right) \\
+	\frac{\partial F}{\partial h} (g,h) = 2  \bm{P}_h \left( \bm{V} - t \bm{d} \right)
+\end{align} 
+
+
 
 Hessian of $F$:
 \begin{align}
@@ -189,22 +204,25 @@ Hessian of $F$:
 		 \frac{\partial^2 F}{\partial hg} & \frac{\partial^2 F}{\partial h^2}
 	\end{bmatrix}  
 \end{align}
-where
+
+The analytical formulae could be derived to calculate precise $\bm{H_F}$; however, the calculation process is quite time-consuming.
 \begin{align}
-	\frac{\partial F}{\partial g^2} (g,h) = 2  \frac{\partial^2 \bm{P}}{\partial g^2}  \left( \bm{P} + 1 - \bm{R} \right)
+	\frac{\partial F}{\partial g^2} = 2 \left[ \left| \bm{P}_g \right|^2 - (\bm{P}_g \cdot \bm{d})^2 + \bm{V} \cdot \bm{P}_{gg} - (\bm{V} \cdot \bm{d}) (\bm{P}_{gg} \cdot \bm{d}) \right]
 \end{align}
 \begin{align}
-	\frac{\partial F}{\partial h^2} (g,h) = 2  \frac{\partial^2 \bm{P}}{\partial h^2}  \left( \bm{P} + 1 - \bm{R} \right)
+	\frac{\partial F}{\partial h^2} = 2 \left[ \left| \bm{P}_h \right|^2 - (\bm{P}_h \cdot \bm{d})^2 + \bm{V} \cdot \bm{P}_{hh} - (\bm{V} \cdot \bm{d}) (\bm{P}_{hh} \cdot \bm{d}) \right]
 \end{align}
 \begin{align}
-	\frac{\partial F}{\partial gh} (g,h) = \frac{\partial F}{\partial hg} (g,h) = 2  \frac{\partial^2 \bm{P}}{\partial gh}  \left( \bm{P} + 1 - \bm{R} \right)
+	\frac{\partial F}{\partial gh} = 2 \left[ \bm{P}_g \cdot \bm{P}_h - (\bm{P}_g \cdot \bm{d}) (\bm{P}_h \cdot \bm{d}) + \bm{V} \cdot \bm{P}_{gh} - (\bm{V} \cdot \bm{d}) (\bm{P}_{gh} \cdot \bm{d}) \right]
 \end{align}
 
 
 The update by solving a linear system:
 \begin{align}
+	\bm{x} = \left[ g, h \right]^T \\
 	\bm{\Delta} = \left[ \Delta g, \Delta h \right]^T \\
-	\bm{H_F} \cdot \bm{\Delta} = - \bm{J_F}
+	\bm{\Delta} = - s \bm{H_F}^{-1} \bm{J_F} \\
+	\bm{H_F} \cdot \bm{\Delta} = - s \bm{J_F}
 \end{align}
 
 \begin{align}
@@ -215,7 +233,31 @@ The update by solving a linear system:
 	\begin{bmatrix}
 		\Delta g \\
 		\Delta h
-	\end{bmatrix} = - \left[ \frac{\partial F}{\partial g}, \frac{\partial F}{\partial h} \right]^T
+	\end{bmatrix} = - s \left[ \frac{\partial F}{\partial g}, \frac{\partial F}{\partial h} \right]^T
+\end{align}
+where $s$ is a scalar satisfying the following relationship:
+\begin{align}
+	s = \min_{s} \left( F \left( \bm{x} - s \bm{H_F}^{-1} \bm{J_F} \right) \right)
+\end{align}
+
+The scalar $s$ can be found by employing backtracking line search with Armijo condition in the following direction \cite{Numerical_methods_Dennis}:
+\begin{align}
+	\bm{p} = -\bm{H_F}^{-1} \bm{J_F}
+\end{align}
+The directional derivative is:
+\begin{align}
+	D_p = \bm{J_F} \cdot \bm{p}
+\end{align}
+
+Iterate $\bm{x}$ as:
+\begin{align}
+	\bm{x} = \bm{x_{init}} + s \bm{p} \\
+	s = s \beta
+\end{align}
+
+Iterate until Armijo condition is fulfilled:
+\begin{align}
+	F(\bm{x}) \leq F(\bm{x_{init}}) + cs D_p
 \end{align}
 
 

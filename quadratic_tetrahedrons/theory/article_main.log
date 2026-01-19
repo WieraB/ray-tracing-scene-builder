@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2026.1.7)  14 JAN 2026 17:04
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2026.1.7)  19 JAN 2026 14:01
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -421,13 +421,13 @@ Overfull \hbox (2.61108pt too wide) has occurred while \output is active
 
 
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}] [2]
-<figures/ray-surface_distance.png, id=25, 283.0575pt x 232.87pt>
+<figures/ray-surface_distance.png, id=24, 283.0575pt x 232.87pt>
 File: figures/ray-surface_distance.png Graphic file (type png)
 <use figures/ray-surface_distance.png>
 Package pdftex.def Info: figures/ray-surface_distance.png  used on input line 1
-54.
+56.
 (pdftex.def)             Requested size: 155.99762pt x 128.34183pt.
- [3] [4 <./figures/ray-surface_distance.png>] (./article_main.bbl
+ [3] [4 <./figures/ray-surface_distance.png>] [5] (./article_main.bbl
 Underfull \hbox (badness 10000) in paragraph at lines 22--29
 []\OT1/cmr/m/n/12 D. L. Toth,  On ray trac-ing para-met-ric sur-
  []
@@ -444,22 +444,22 @@ Underfull \hbox (badness 10000) in paragraph at lines 22--29
  []
 
 
-Underfull \hbox (badness 6461) in paragraph at lines 30--37
+Underfull \hbox (badness 6461) in paragraph at lines 30--38
 []\OT1/cmr/m/n/12 K. I. Joy, M. N. Bhetan-ab-hotla,  Ray trac-ing para-met-ric
  []
 
 
-Underfull \hbox (badness 7759) in paragraph at lines 30--37
+Underfull \hbox (badness 7759) in paragraph at lines 30--38
 \OT1/cmr/m/n/12 sur-face patches uti-liz-ing nu-mer-i-cal tech-niques and ray c
 o-her-
  []
 
 
-Underfull \hbox (badness 3009) in paragraph at lines 30--37
+Underfull \hbox (badness 3009) in paragraph at lines 30--38
 \OT1/cmr/m/n/12 ence,  SIG-GRAPH Com-put. Graph. 20 (1986) 279{285. URL:
  []
 
-)
+[6])
 
 Package caption Warning: Unused \captionsetup[table] on input line 13.
 See the caption package documentation for explanation.
@@ -468,20 +468,20 @@ See the caption package documentation for explanation.
 Package caption Warning: Unused \captionsetup[subfigure] on input line 21.
 See the caption package documentation for explanation.
 
-[5] (./article_main.aux)
+[7] (./article_main.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-22>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 7177 strings out of 474222
- 115768 string characters out of 5748734
- 1938975 words of memory out of 5000000
- 29312 multiletter control sequences out of 15000+600000
+ 7180 strings out of 474222
+ 115864 string characters out of 5748734
+ 1940975 words of memory out of 5000000
+ 29315 multiletter control sequences out of 15000+600000
  566644 words of font info for 67 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 72i,14n,79p,401b,356s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 72i,14n,79p,401b,395s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></us
 r/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx8.pfb></usr/share
 /texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texli
@@ -499,10 +499,10 @@ msfonts/cm/cmr17.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts
 are/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/share/te
 xlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb></usr/share/texlive/
 texmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb>
-Output written on article_main.pdf (5 pages, 212956 bytes).
+Output written on article_main.pdf (7 pages, 217806 bytes).
 PDF statistics:
- 113 PDF objects out of 1000 (max. 8388607)
- 67 compressed objects within 1 object stream
+ 121 PDF objects out of 1000 (max. 8388607)
+ 73 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  6 words of extra memory for PDF output out of 10000 (max. 10000000)
 
