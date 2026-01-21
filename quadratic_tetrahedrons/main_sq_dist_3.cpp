@@ -1,3 +1,8 @@
+// Scalar squared distance between a paramateric surface P(g,h) and ray R(t) is defined. 
+// The trasnformation is R^3 -> R^1.
+// Quasi-Newton method is used to find this distance.
+// Backtracking line search is employed here prior to each Newton iteration.
+
 #include <math.h> 
 #include <stdlib.h> // Make : g++ -O3 -fopenmp smallpt.cpp -o smallpt
 #include <stdio.h> 
@@ -347,7 +352,7 @@ struct Quadratic_tet {
 
       double beta = 0.5;       // Contraction factor (0 < beta < 1)
       double c = 1e-4;         // Armijo condition constant
-      int max_iter = 1000;
+      int max_iter = 100;
 
       Eigen::VectorXd N = get_face_N(x_init.x(), x_init.y());
       Eigen::Vector3d P = Eigen::Vector3d::Zero();
@@ -404,11 +409,11 @@ struct Quadratic_tet {
 
       const double eps_t = 1e-8; // Imprecision for t
 
-      const int iter_max = 1500; // Maximum number of iterations for Newton-Raphson method.
+      const int iter_max = 100; // Maximum number of iterations for Newton-Raphson method.
 
       // Define imprecision parameters for the solution.
       // Imprecision levels should be relatively small for solution.
-      const double eps_sol1 = 1; // Imprecision for distance
+          const double eps_sol1 = 0.0001; // Imprecision for the residual (i.e. squared distance)
       const double eps_sol2 = 1e-8; // Imprecision for the quadratic triangle's isoparametric coordinates (g, h)
       const double eps_sol3 = 1e-10; // Imprecision for the determinant
       const double eps_sol4 = 0.1; // Convergence criteria, max allowed relative difference
@@ -457,15 +462,10 @@ struct Quadratic_tet {
 
                 Eigen::Vector3d V = P - r.o;
                 t = V.dot(r.d);
-                res_prev = res;
-                res = V.squaredNorm() - (t * t);
-                double diff = abs(res-res_prev) / abs(res);
+                double res = V.squaredNorm() - (t * t);
 
-                if ( diff < eps_sol4) {
+                  if (res < eps_sol1) {
 
-                    if (res >= eps_sol1) break;
-                    // std::cout << diff << "    ";
-                  
                     if (gh.x() >= 0 - eps_sol2 && gh.y() >= 0 - eps_sol2 && (gh.x() + gh.y()) <= 1 + eps_sol2) {
                         if (t < min_t && t > eps_t) {
                             min_t = t;
@@ -480,12 +480,12 @@ struct Quadratic_tet {
                 // Solve H_F * [dg, dh]^T = -J_F
                 M = get_eq_Hessian(gh.x(), gh.y(), f_nodes, r);
                 Eigen::Vector2d J_F = get_eq_Jacobian(gh.x(), gh.y(), f_nodes, r);
-                Eigen::Vector2d dir = M.inverse() * (-J_F);
+                Eigen::Vector2d dir = M.colPivHouseholderQr().solve(J_F);
 
                 double s = backtracking_line_search(dir, gh, J_F, f_nodes, r);
 
                 if (std::abs(M.determinant()) < eps_sol3) break;
-                Eigen::Vector2d delta = s * M.inverse() * (-J_F);
+                Eigen::Vector2d delta = - M.colPivHouseholderQr().solve(J_F);
                 gh.x() += delta.x();
                 gh.y() += delta.y();
             }
@@ -954,7 +954,7 @@ int main(int argc,char *argv[]){
 
 
    Mesh mesh;
-   mesh.loadVolFile("sphere.vol");
+   mesh.loadVolFile("sphere_1.vol");
    mesh.getElementCoords();
 
 
